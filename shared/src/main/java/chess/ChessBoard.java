@@ -52,9 +52,13 @@ public class ChessBoard {
                 ChessPiece.PieceType.KNIGHT,
                 ChessPiece.PieceType.ROOK
         };
-        for (int i = 1; i < 8; i++) {
-            addPiece(new ChessPosition(1, i), new ChessPiece(ChessGame.TeamColor.WHITE, backRow[i]));
-            addPiece(new ChessPosition(8, i), new ChessPiece(ChessGame.TeamColor.BLACK, backRow[i]));
+        for (int i = 1; i <= 8; i++) {
+            System.out.println(i);
+            addPiece(new ChessPosition(1, i), new ChessPiece(ChessGame.TeamColor.WHITE, backRow[i - 1]));
+            System.out.println("W " + backRow[i - 1]);
+            addPiece(new ChessPosition(8, i), new ChessPiece(ChessGame.TeamColor.BLACK, backRow[i - 1]));
+            System.out.println("B " + backRow[i - 1]);
         }
+        System.out.println("Board Complete");
     }
 }
