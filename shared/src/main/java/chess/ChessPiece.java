@@ -1,5 +1,6 @@
 package chess;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Objects;
 
@@ -54,7 +55,7 @@ public class ChessPiece {
      * @return Which team this chess piece belongs to
      */
     public ChessGame.TeamColor getTeamColor() {
-        return this.color;
+        return color;
     }
 
     /**
@@ -72,6 +73,41 @@ public class ChessPiece {
      * @return Collection of valid moves
      */
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
-        throw new RuntimeException("Not implemented");
+        Collection<ChessMove> moves = new ArrayList<>();
+        switch (type) {
+            case BISHOP:
+            moves.addAll(diagonalMoves(board, myPosition));
+        }
+        return moves;
+    }
+
+    private Collection<ChessMove> diagonalMoves(ChessBoard board, ChessPosition myPosition) {
+        Collection<ChessMove> moves = new ArrayList<>();
+        //list of directions (up right, up left, down right, down left)
+        int [][] directions = {{1,1},{1,-1},{-1,1},{-1,-1}};
+        for (int[] direction : directions) {
+            int rowOffset = direction[0];
+            int colOffset = direction[1];
+            int row = myPosition.getRow() + rowOffset;
+            int col = myPosition.getColumn() + colOffset;
+            while ((1 <= row) && (row <= 8) && (1 <= col) && (col <= 8)) {
+                //empty space
+                if (board.getPiece(new ChessPosition(row,col)) == null) {
+                    moves.add(new ChessMove(myPosition, new ChessPosition(row, col), null));
+                    row += rowOffset;
+                    col += colOffset;
+                }
+                //enemy piece
+                else if (board.getPiece(new ChessPosition(row,col)).getTeamColor() != color) {
+                    moves.add(new ChessMove(myPosition, new ChessPosition(row, col), null));
+                    break;
+                }
+                //friendly piece
+                else if (board.getPiece(new ChessPosition(row,col)).getTeamColor() == color) {
+                    break;
+                }
+            }
+        }
+        return moves;
     }
 }
