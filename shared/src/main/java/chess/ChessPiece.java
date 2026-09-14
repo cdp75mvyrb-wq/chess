@@ -76,7 +76,15 @@ public class ChessPiece {
         Collection<ChessMove> moves = new ArrayList<>();
         switch (type) {
             case BISHOP:
-            moves.addAll(diagonalMoves(board, myPosition));
+                moves.addAll(diagonalMoves(board, myPosition));
+                break;
+            case ROOK:
+                moves.addAll(straightMoves(board, myPosition));
+                break;
+            case QUEEN:
+                moves.addAll(straightMoves(board, myPosition));
+                moves.addAll(diagonalMoves(board, myPosition));
+                break;
         }
         return moves;
     }
@@ -85,6 +93,36 @@ public class ChessPiece {
         Collection<ChessMove> moves = new ArrayList<>();
         //list of directions (up right, up left, down right, down left)
         int [][] directions = {{1,1},{1,-1},{-1,1},{-1,-1}};
+        for (int[] direction : directions) {
+            int rowOffset = direction[0];
+            int colOffset = direction[1];
+            int row = myPosition.getRow() + rowOffset;
+            int col = myPosition.getColumn() + colOffset;
+            while ((1 <= row) && (row <= 8) && (1 <= col) && (col <= 8)) {
+                //empty space
+                if (board.getPiece(new ChessPosition(row,col)) == null) {
+                    moves.add(new ChessMove(myPosition, new ChessPosition(row, col), null));
+                    row += rowOffset;
+                    col += colOffset;
+                }
+                //enemy piece
+                else if (board.getPiece(new ChessPosition(row,col)).getTeamColor() != color) {
+                    moves.add(new ChessMove(myPosition, new ChessPosition(row, col), null));
+                    break;
+                }
+                //friendly piece
+                else if (board.getPiece(new ChessPosition(row,col)).getTeamColor() == color) {
+                    break;
+                }
+            }
+        }
+        return moves;
+    }
+
+    private Collection<ChessMove> straightMoves(ChessBoard board, ChessPosition myPosition) {
+        Collection<ChessMove> moves = new ArrayList<>();
+        //list of directions (right, left, up, down)
+        int [][] directions = {{1,0},{-1,0},{0,1},{0,-1}};
         for (int[] direction : directions) {
             int rowOffset = direction[0];
             int colOffset = direction[1];
