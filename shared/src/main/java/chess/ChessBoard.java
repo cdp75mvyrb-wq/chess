@@ -1,5 +1,8 @@
 package chess;
 
+import java.util.Arrays;
+import java.util.Objects;
+
 /**
  * A chessboard that can hold and rearrange chess pieces.
  * <p>
@@ -35,6 +38,20 @@ public class ChessBoard {
         } else {return null;}
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        ChessBoard that = (ChessBoard) o;
+        return Objects.deepEquals(board, that.board);
+    }
+
+    @Override
+    public int hashCode() {
+        return Arrays.deepHashCode(board);
+    }
+
     /**
      * Sets the board to the default starting board
      * (How the game of chess normally starts)
@@ -59,14 +76,5 @@ public class ChessBoard {
             addPiece(new ChessPosition(2, i), new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.PAWN));
             addPiece(new ChessPosition(7, i), new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.PAWN));
         }
-//        for (int i = 1; i <= 8; i++) {
-//            System.out.println(getPiece(new ChessPosition(1,i)).toString() + " " + new ChessPosition(1,i).toString());
-//        } for (int i = 1; i <= 8; i++) {
-//            System.out.println(getPiece(new ChessPosition(2,i)).toString() + " " +  new ChessPosition(2,i).toString());
-//        } for (int i = 1; i <= 8; i++) {
-//            System.out.println(getPiece(new ChessPosition(7,i)).toString() + " " +  new ChessPosition(7,i).toString());
-//        } for (int i = 1; i <= 8; i++) {
-//            System.out.println(getPiece(new ChessPosition(8,i)).toString() + " " +  new ChessPosition(8,i).toString());
-//        }
     }
 }
