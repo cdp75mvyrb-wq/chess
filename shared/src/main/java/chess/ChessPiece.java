@@ -85,6 +85,22 @@ public class ChessPiece {
                 moves.addAll(straightMoves(board, myPosition));
                 moves.addAll(diagonalMoves(board, myPosition));
                 break;
+            case KING:
+                int [] directions = {-1,0,1};
+                for (int x_direction : directions) {
+                    for (int y_direction : directions) {
+                        int row = myPosition.getRow() + x_direction;
+                        int col = myPosition.getColumn() + y_direction;
+                        //skip current position
+                        if ((x_direction == 0 && y_direction == 0) || ((row < 1 || row > 8) || (col < 1 || col > 8))) {
+                            continue;
+                        }
+                        //empty space or capturable
+                        else if ((board.getPiece(new ChessPosition(row, col)) == null) || ((board.getPiece(new ChessPosition(row, col)).getTeamColor() != color))) {
+                            moves.add(new ChessMove(myPosition, new ChessPosition(row, col), null));
+                        }
+                    }
+                }
         }
         return moves;
     }

@@ -23,7 +23,7 @@ public class ChessBoard {
      */
     public void addPiece(ChessPosition position, ChessPiece piece) {
         board[position.getRow() - 1][position.getColumn() - 1] = piece;
-        System.out.println(piece.toString() + " added to position " + position.toString());
+//        System.out.println(piece.toString() + " added to position " + position.toString());
     }
     /**
      * Gets a chess piece on the chessboard
