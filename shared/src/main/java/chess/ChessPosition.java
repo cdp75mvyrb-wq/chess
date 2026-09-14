@@ -16,6 +16,11 @@ public class ChessPosition {
         this.col = col;
     }
 
+    @Override
+    public String toString() {
+        return row + " " + col;
+    }
+
     public int getRow() {return row;}
 
     public int getColumn() {return col;}

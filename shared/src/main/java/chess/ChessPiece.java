@@ -18,6 +18,11 @@ public class ChessPiece {
         this.type = type;
     }
 
+    @Override
+    public String toString() {
+        return color + " " + type;
+    }
+
     /**
      * The various different chess piece options
      */

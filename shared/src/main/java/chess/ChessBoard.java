@@ -20,7 +20,7 @@ public class ChessBoard {
      */
     public void addPiece(ChessPosition position, ChessPiece piece) {
         board[position.getRow() - 1][position.getColumn() - 1] = piece;
-
+        System.out.println(piece.toString() + " added to position " + position.toString());
     }
     /**
      * Gets a chess piece on the chessboard
@@ -53,12 +53,20 @@ public class ChessBoard {
                 ChessPiece.PieceType.ROOK
         };
         for (int i = 1; i <= 8; i++) {
-            System.out.println(i);
             addPiece(new ChessPosition(1, i), new ChessPiece(ChessGame.TeamColor.WHITE, backRow[i - 1]));
-            System.out.println("W " + backRow[i - 1]);
             addPiece(new ChessPosition(8, i), new ChessPiece(ChessGame.TeamColor.BLACK, backRow[i - 1]));
-            System.out.println("B " + backRow[i - 1]);
+        } for (int i = 1; i <= 8; i++) {
+            addPiece(new ChessPosition(2, i), new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.PAWN));
+            addPiece(new ChessPosition(7, i), new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.PAWN));
         }
-        System.out.println("Board Complete");
+//        for (int i = 1; i <= 8; i++) {
+//            System.out.println(getPiece(new ChessPosition(1,i)).toString() + " " + new ChessPosition(1,i).toString());
+//        } for (int i = 1; i <= 8; i++) {
+//            System.out.println(getPiece(new ChessPosition(2,i)).toString() + " " +  new ChessPosition(2,i).toString());
+//        } for (int i = 1; i <= 8; i++) {
+//            System.out.println(getPiece(new ChessPosition(7,i)).toString() + " " +  new ChessPosition(7,i).toString());
+//        } for (int i = 1; i <= 8; i++) {
+//            System.out.println(getPiece(new ChessPosition(8,i)).toString() + " " +  new ChessPosition(8,i).toString());
+//        }
     }
 }
