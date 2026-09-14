@@ -86,12 +86,12 @@ public class ChessPiece {
                 moves.addAll(diagonalMoves(board, myPosition));
                 break;
             case KING:
-                int [] directions = {-1,0,1};
-                for (int x_direction : directions) {
-                    for (int y_direction : directions) {
+                int[] kingDirections = {-1, 0, 1};
+                for (int x_direction : kingDirections) {
+                    for (int y_direction : kingDirections) {
                         int row = myPosition.getRow() + x_direction;
                         int col = myPosition.getColumn() + y_direction;
-                        //skip current position
+                        //skip current position or out of bounds moves
                         if ((x_direction == 0 && y_direction == 0) || ((row < 1 || row > 8) || (col < 1 || col > 8))) {
                             continue;
                         }
@@ -99,6 +99,22 @@ public class ChessPiece {
                         else if ((board.getPiece(new ChessPosition(row, col)) == null) || ((board.getPiece(new ChessPosition(row, col)).getTeamColor() != color))) {
                             moves.add(new ChessMove(myPosition, new ChessPosition(row, col), null));
                         }
+                    }
+                }
+            case KNIGHT:
+                int[][] knightDirections = {{1, -2}, {2, -1}, {2, 1}, {1, 2}, {-1, -2}, {-2, -1}, {-2, 1}, {-1, 2}};
+                for (int[] direction : knightDirections) {
+                    int rowOffset = direction[0];
+                    int colOffset = direction[1];
+                    int row = myPosition.getRow() + rowOffset;
+                    int col = myPosition.getColumn() + colOffset;
+                    //skip current position or out of bounds moves
+                    if ((row < 1 || row > 8) || (col < 1 || col > 8)) {
+                        continue;
+                    }
+                    //empty space or capturable
+                    else if ((board.getPiece(new ChessPosition(row, col)) == null) || ((board.getPiece(new ChessPosition(row, col)).getTeamColor() != color))) {
+                        moves.add(new ChessMove(myPosition, new ChessPosition(row, col), null));
                     }
                 }
         }
