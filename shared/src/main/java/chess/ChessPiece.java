@@ -1,5 +1,6 @@
 package chess;
 
+import java.util.List;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Objects;
@@ -73,58 +74,36 @@ public class ChessPiece {
      * @return Collection of valid moves
      */
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
-        Collection<ChessMove> moves = new ArrayList<>();
+        List<ChessMove> moves = new ArrayList<>();
+        int [][] diagonalDirections = {{1,1},{1,-1},{-1,1},{-1,-1}};
+        int [][] straightDirections = {{1,0},{-1,0},{0,1},{0,-1}};
         switch (type) {
             case BISHOP:
-                moves.addAll(diagonalMoves(board, myPosition));
+                moves.addAll(slideMoves(board, myPosition, diagonalDirections));
                 break;
             case ROOK:
-                moves.addAll(straightMoves(board, myPosition));
+                moves.addAll(slideMoves(board, myPosition, straightDirections));
                 break;
             case QUEEN:
-                moves.addAll(straightMoves(board, myPosition));
-                moves.addAll(diagonalMoves(board, myPosition));
+                moves.addAll(slideMoves(board, myPosition, diagonalDirections));
+                moves.addAll(slideMoves(board, myPosition, straightDirections));
                 break;
             case KING:
-                int[] kingDirections = {-1, 0, 1};
-                for (int x_direction : kingDirections) {
-                    for (int y_direction : kingDirections) {
-                        int row = myPosition.getRow() + x_direction;
-                        int col = myPosition.getColumn() + y_direction;
-                        //skip current position or out of bounds moves
-                        if ((x_direction == 0 && y_direction == 0) || ((row < 1 || row > 8) || (col < 1 || col > 8))) {
-                            continue;
-                        }
-                        //empty space or capturable
-                        else if ((board.getPiece(new ChessPosition(row, col)) == null) || ((board.getPiece(new ChessPosition(row, col)).getTeamColor() != color))) {
-                            moves.add(new ChessMove(myPosition, new ChessPosition(row, col), null));
-                        }
-                    }
-                }
+                int[][] kingDirections = {{1, 0}, {-1, 0}, {0, 1}, {0, -1}, {-1, -1}, {1, -1}, {-1, 1}, {1, 1}};
+                moves.addAll(staticMoves(board, myPosition, kingDirections));
+                break;
             case KNIGHT:
                 int[][] knightDirections = {{1, -2}, {2, -1}, {2, 1}, {1, 2}, {-1, -2}, {-2, -1}, {-2, 1}, {-1, 2}};
-                for (int[] direction : knightDirections) {
-                    int rowOffset = direction[0];
-                    int colOffset = direction[1];
-                    int row = myPosition.getRow() + rowOffset;
-                    int col = myPosition.getColumn() + colOffset;
-                    //skip current position or out of bounds moves
-                    if ((row < 1 || row > 8) || (col < 1 || col > 8)) {
-                        continue;
-                    }
-                    //empty space or capturable
-                    else if ((board.getPiece(new ChessPosition(row, col)) == null) || ((board.getPiece(new ChessPosition(row, col)).getTeamColor() != color))) {
-                        moves.add(new ChessMove(myPosition, new ChessPosition(row, col), null));
-                    }
-                }
+                moves.addAll(staticMoves(board, myPosition, knightDirections));
+                break;
+            case PAWN:
+
         }
         return moves;
     }
 
-    private Collection<ChessMove> diagonalMoves(ChessBoard board, ChessPosition myPosition) {
+    private Collection<ChessMove> slideMoves(ChessBoard board, ChessPosition myPosition, int[][] directions) {
         Collection<ChessMove> moves = new ArrayList<>();
-        //list of directions (up right, up left, down right, down left)
-        int [][] directions = {{1,1},{1,-1},{-1,1},{-1,-1}};
         for (int[] direction : directions) {
             int rowOffset = direction[0];
             int colOffset = direction[1];
@@ -151,31 +130,20 @@ public class ChessPiece {
         return moves;
     }
 
-    private Collection<ChessMove> straightMoves(ChessBoard board, ChessPosition myPosition) {
+    private Collection<ChessMove> staticMoves(ChessBoard board, ChessPosition myPosition, int[][] directions) {
         Collection<ChessMove> moves = new ArrayList<>();
-        //list of directions (right, left, up, down)
-        int [][] directions = {{1,0},{-1,0},{0,1},{0,-1}};
         for (int[] direction : directions) {
             int rowOffset = direction[0];
             int colOffset = direction[1];
             int row = myPosition.getRow() + rowOffset;
             int col = myPosition.getColumn() + colOffset;
-            while ((1 <= row) && (row <= 8) && (1 <= col) && (col <= 8)) {
-                //empty space
-                if (board.getPiece(new ChessPosition(row,col)) == null) {
-                    moves.add(new ChessMove(myPosition, new ChessPosition(row, col), null));
-                    row += rowOffset;
-                    col += colOffset;
-                }
-                //enemy piece
-                else if (board.getPiece(new ChessPosition(row,col)).getTeamColor() != color) {
-                    moves.add(new ChessMove(myPosition, new ChessPosition(row, col), null));
-                    break;
-                }
-                //friendly piece
-                else if (board.getPiece(new ChessPosition(row,col)).getTeamColor() == color) {
-                    break;
-                }
+            //skip current position or out of bounds moves
+            if ((row < 1 || row > 8) || (col < 1 || col > 8)) {
+                continue;
+            }
+            //empty space or capturable
+            else if ((board.getPiece(new ChessPosition(row, col)) == null) || ((board.getPiece(new ChessPosition(row, col)).getTeamColor() != color))) {
+                moves.add(new ChessMove(myPosition, new ChessPosition(row, col), null));
             }
         }
         return moves;
