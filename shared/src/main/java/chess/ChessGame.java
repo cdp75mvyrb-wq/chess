@@ -62,9 +62,11 @@ public class ChessGame {
         }
         // collect all possible moves
         Collection<ChessMove> allMoves = startPiece.pieceMoves(board, startPosition);
-        // add any en passant possible moves
-        allMoves.addAll(enPassantMoves(startPosition, piece));
-
+        // add any en passant possible moves if not first move of the game
+        if (lastMove != null) {
+            System.out.println("Not first move of the game");
+            allMoves.addAll(enPassantMoves(startPosition, startPiece));
+        }
         Collection<ChessMove> validMoves = new ArrayList<>();
         for (ChessMove move : allMoves) {
             // make copy
@@ -98,7 +100,23 @@ public class ChessGame {
 
     private Collection<ChessMove> enPassantMoves(ChessPosition position, ChessPiece piece) {
         Collection<ChessMove> newMoves = new ArrayList<>();
-
+        ChessPiece.PieceType pieceType = piece.getPieceType();
+        int row = position.getRow();
+        int col = position.getColumn();
+        int rowDiff = Math.abs(lastMove.getEndPosition().getRow() - lastMove.getStartPosition().getRow());
+        // check that:
+        // current piece pawn
+        // last move made by pawn
+        // last move made to current piece's row
+        // last move was two squares
+        System.out.println("En passant condition 0 met.");
+        if (pieceType.equals(ChessPiece.PieceType.PAWN)
+                && board.getPiece(lastMove.getEndPosition()).getPieceType().equals(ChessPiece.PieceType.PAWN)
+                && lastMove.getEndPosition().getRow() == row
+                && rowDiff == 2) {
+            System.out.println("En passant condition 1 met.");
+            // if last move made next to current pawn piece
+        }
         return newMoves;
     }
 
