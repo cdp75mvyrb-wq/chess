@@ -96,6 +96,14 @@ public class ChessGame {
         }
     }
 
+    private Collection<ChessMove> enPassantMoves(ChessPosition position, ChessPiece piece) {
+        Collection<ChessMove> newMoves = new ArrayList<>();
+
+        return newMoves;
+    }
+
+
+
     /**
      * Determines if the given team is in check
      *
