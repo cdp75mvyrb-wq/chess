@@ -64,7 +64,6 @@ public class ChessGame {
         Collection<ChessMove> allMoves = startPiece.pieceMoves(board, startPosition);
         // add any en passant possible moves if not first move of the game
         if (lastMove != null) {
-            System.out.println("Not first move of the game");
             allMoves.addAll(enPassantMoves(startPosition, startPiece));
         }
         Collection<ChessMove> validMoves = new ArrayList<>();
@@ -99,7 +98,7 @@ public class ChessGame {
     }
 
     private Collection<ChessMove> enPassantMoves(ChessPosition position, ChessPiece piece) {
-        Collection<ChessMove> newMoves = new ArrayList<>();
+        Collection<ChessMove> enPassantMoves = new ArrayList<>();
         ChessPiece.PieceType pieceType = piece.getPieceType();
         int row = position.getRow();
         int col = position.getColumn();
@@ -109,15 +108,25 @@ public class ChessGame {
         // last move made by pawn
         // last move made to current piece's row
         // last move was two squares
-        System.out.println("En passant condition 0 met.");
         if (pieceType.equals(ChessPiece.PieceType.PAWN)
                 && board.getPiece(lastMove.getEndPosition()).getPieceType().equals(ChessPiece.PieceType.PAWN)
                 && lastMove.getEndPosition().getRow() == row
                 && rowDiff == 2) {
-            System.out.println("En passant condition 1 met.");
+            boolean white = piece.getTeamColor() == ChessGame.TeamColor.WHITE;
+            int direction = white ? 1 : -1;
+            // pawn is to the left of current pawn (looking at board from white side)
+            if (lastMove.getEndPosition().getColumn() - col == 1) {
+                System.out.println("En passant added to left of current pawn");
+                enPassantMoves.add(new ChessMove(position, new ChessPosition(row + direction, col - 1), null));
+            }
+            // pawn is to the right of current pawn (looking at board from white side)
+            else if (lastMove.getEndPosition().getColumn() - col == - 1) {
+                System.out.println("En passant added to right of current pawn");
+                enPassantMoves.add(new ChessMove(position, new ChessPosition(row + direction, col + 1), null));
+            }
             // if last move made next to current pawn piece
         }
-        return newMoves;
+        return enPassantMoves;
     }
 
 
