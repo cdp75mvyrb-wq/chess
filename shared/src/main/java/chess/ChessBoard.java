@@ -78,6 +78,8 @@ public class ChessBoard {
         }
     }
 
+    // returns an exact copy of the board
+
     public ChessBoard copy() {
         ChessBoard newBoard = new ChessBoard();
         for (int row = 0; row < 8; row++) {
@@ -86,5 +88,18 @@ public class ChessBoard {
             }
         }
         return newBoard;
+    }
+
+    // takes a piece and move
+    // makes the move on the board
+
+    public void movePiece(ChessPiece piece, ChessMove move) {
+        // change to promotion piece if needed
+        if (move.getPromotionPiece() != null) {
+            piece = new ChessPiece(piece.getTeamColor(), move.getPromotionPiece());
+        }
+        // move piece
+        this.addPiece(move.getEndPosition(), piece);
+        this.addPiece(move.getStartPosition(), null);
     }
 }

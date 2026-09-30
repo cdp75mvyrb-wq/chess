@@ -66,13 +66,7 @@ public class ChessGame {
             // make copy
             ChessBoard simulationBoard = board.copy();
             ChessPiece movingPiece = new ChessPiece(color,startPiece.getPieceType());
-            // change to promotion piece if needed
-            if (move.getPromotionPiece() != null) {
-                movingPiece = new ChessPiece(color, move.getPromotionPiece());
-            }
-            // move piece
-            simulationBoard.addPiece(move.getEndPosition(), movingPiece);
-            simulationBoard.addPiece(startPosition, null);
+            simulationBoard.movePiece(movingPiece, move);
             if (!isInCheck(color, simulationBoard)) {
                 validMoves.add(move);
             }
@@ -87,7 +81,14 @@ public class ChessGame {
      * @throws InvalidMoveException if move is invalid
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
-        throw new RuntimeException("Not implemented");
+        ChessPiece piece = board.getPiece(move.getStartPosition());
+        if (piece != null && piece.getTeamColor() == getTeamTurn() && validMoves(move.getStartPosition()).contains(move)) {
+            board.movePiece(piece, move);
+            boolean whiteTurn = getTeamTurn() == TeamColor.WHITE;
+            setTeamTurn(whiteTurn ? TeamColor.BLACK : TeamColor.WHITE);
+        } else {
+            throw new InvalidMoveException("Move invalid");
+        }
     }
 
     /**
