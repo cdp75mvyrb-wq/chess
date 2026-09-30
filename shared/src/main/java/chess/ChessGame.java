@@ -114,12 +114,10 @@ public class ChessGame {
                 && rowDiff == 2) {
             boolean white = piece.getTeamColor() == ChessGame.TeamColor.WHITE;
             int direction = white ? 1 : -1;
-            // pawn is to the left or right of current pawn
+            // pawn is to the left or right of current pawn, add en passant
             if (Math.abs(lastMove.getEndPosition().getColumn() - col) == 1) {
-                System.out.println("En passant added"
                 enPassantMoves.add(new ChessMove(position, new ChessPosition(row + direction, lastMove.getEndPosition().getColumn()), null));
             }
-            // if last move made next to current pawn piece
         }
         return enPassantMoves;
     }

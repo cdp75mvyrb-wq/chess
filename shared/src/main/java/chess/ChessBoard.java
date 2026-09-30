@@ -98,6 +98,15 @@ public class ChessBoard {
         if (move.getPromotionPiece() != null) {
             piece = new ChessPiece(piece.getTeamColor(), move.getPromotionPiece());
         }
+        // check if en passant:
+        // if moving piece is pawn
+        // target square is empty
+        // pawn moved diagonally
+        if (piece.getPieceType() == ChessPiece.PieceType.PAWN
+                && this.getPiece(move.getEndPosition()) == null
+                && move.getStartPosition().getColumn() - move.getEndPosition().getColumn() != 0) {
+            this.addPiece(new ChessPosition(move.getStartPosition().getRow(), move.getEndPosition().getColumn()), null);
+        }
         // move piece
         this.addPiece(move.getEndPosition(), piece);
         this.addPiece(move.getStartPosition(), null);
