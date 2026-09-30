@@ -53,10 +53,31 @@ public class ChessGame {
      * startPosition
      */
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
-        Collection<ChessMove> allMoves = board.getPiece(startPosition).pieceMoves(board, startPosition);
-        for (ChessMove move : allMoves) {
-            // simulate move
+        ChessPiece startPiece = board.getPiece(startPosition);
+        TeamColor color = startPiece.getTeamColor();
+        // square is empty
+        if (startPiece == null) {
+            return null;
         }
+        //collect all possible moves
+        Collection<ChessMove> allMoves = startPiece.pieceMoves(board, startPosition);
+        Collection<ChessMove> validMoves = new ArrayList<>();
+        for (ChessMove move : allMoves) {
+            // make copy
+            ChessBoard simulationBoard = board.copy();
+            ChessPiece movingPiece = new ChessPiece(color,startPiece.getPieceType());
+            // change to promotion piece if needed
+            if (move.getPromotionPiece() != null) {
+                movingPiece = new ChessPiece(color, move.getPromotionPiece());
+            }
+            // move piece
+            simulationBoard.addPiece(move.getEndPosition(), movingPiece);
+            simulationBoard.addPiece(startPosition, null);
+            if (!isInCheck(color, simulationBoard)) {
+                validMoves.add(move);
+            }
+        }
+        return validMoves;
     }
 
     /**
@@ -76,6 +97,39 @@ public class ChessGame {
      * @return True if the specified team is in check
      */
     public boolean isInCheck(TeamColor teamColor) {
+        // (same board pass):
+        Collection<ChessMove> enemyMoves = new ArrayList<>();
+        ChessPosition kingPosition = null;
+        for (int row = 1; row <= 8; row++) {
+            for (int col = 1; col <= 8; col++) {
+                ChessPosition square = new ChessPosition(row, col);
+                ChessPiece piece = this.board.getPiece(square);
+                // skip empty squares
+                if (piece == null) {continue;}
+                // get team's king position
+                else if (piece.getPieceType() == ChessPiece.PieceType.KING && piece.getTeamColor() == teamColor) {
+                    kingPosition = square;
+                }
+                // get enemy pieces / moves
+                else if (piece.getTeamColor() != teamColor) {
+                    enemyMoves.addAll(piece.pieceMoves(this.board, square));
+                }
+            }
+        }
+        for (ChessMove move : enemyMoves) {
+            ChessPosition endPosition = move.getEndPosition();
+            if (endPosition.equals(kingPosition)) {
+                return true;
+            }
+        }
+        // no pieces can attack king
+        return false;
+    }
+
+    // same function as before, only private and takes board as a parameter rather than using this.board
+    // used in simulation boards only
+
+    private boolean isInCheck(TeamColor teamColor, ChessBoard board) {
         // (same board pass):
         Collection<ChessMove> enemyMoves = new ArrayList<>();
         ChessPosition kingPosition = null;
@@ -112,8 +166,8 @@ public class ChessGame {
      * @return True if the specified team is in checkmate
      */
     public boolean isInCheckmate(TeamColor teamColor) {
-//        if isInCheck and validMoves ==  null return true
-//            else return false
+        if (isInCheck(teamColor) && validMoves() ==  null) {return true;}
+            else return false
         throw new RuntimeException("Not implemented");
     }
 

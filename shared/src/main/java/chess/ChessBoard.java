@@ -77,4 +77,14 @@ public class ChessBoard {
             addPiece(new ChessPosition(7, i), new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.PAWN));
         }
     }
+
+    public ChessBoard copy() {
+        ChessBoard newBoard = new ChessBoard();
+        for (int row = 0; row < 8; row++) {
+            for (int col = 0; col < 8; col++) {
+                newBoard.board[row][col] = board[row][col];
+            }
+        }
+        return newBoard;
+    }
 }
