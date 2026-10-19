@@ -1,5 +1,6 @@
 package dataaccess;
 
+import chess.ChessGame;
 import com.sun.security.jgss.AuthorizationDataEntry;
 import model.AuthData;
 import model.GameData;
@@ -12,6 +13,8 @@ public class MemoryDataAccess implements DataAccess {
     final Map<String, UserData> users = new HashMap<>();
     final Map<Integer, GameData> games = new HashMap<>();
     final Map<String, AuthData> auths = new HashMap<>();
+
+    private int nextGameId = 1;
 
     public void clear() {
 
@@ -38,42 +41,45 @@ public class MemoryDataAccess implements DataAccess {
     }
 
     @Override
-    public void updateGame(GameData gameData) {
-        games.put(gameData.gameID(), gameData);
+    public void updateGame(GameData game) {
+        games.put(game.gameID(), game);
     }
 
     @Override
     public void createUser(UserData userData) {
-
+        users.put(userData.username(), userData);
     }
 
     @Override
     public void createAuth(AuthData authData) {
-
+        auths.put(authData.authToken(), authData);
     }
 
     @Override
     public void deleteAuth(String authToken) {
-
+        auths.remove(authToken);
     }
 
     @Override
-    public GameData createGame(String gameName) {
-        return null;
+    public int createGame(String gameName) {
+        nextGameId += 1;
+        GameData newGame = new GameData(nextGameId, null, null, gameName, new ChessGame());
+        games.put(newGame.gameID(), newGame);
+        return newGame.gameID();
     }
 
     @Override
     public void clearUsers() throws DataAccessException {
-
+        users.clear();
     }
 
     @Override
     public void clearAuthTokens() throws DataAccessException {
-
+        auths.clear();
     }
 
     @Override
     public void clearGames() throws DataAccessException {
-
+        games.clear();
     }
 }
