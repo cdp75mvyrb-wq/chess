@@ -4,8 +4,10 @@ import dataaccess.DataAccess;
 import dataaccess.DataAccessException;
 import model.AuthData;
 import request.LoginRequest;
+import request.LogoutRequest;
 import request.RegisterRequest;
 import result.LoginResult;
+import result.LogoutResult;
 import result.RegisterResult;
 import model.UserData;
 import service.exception.AlreadyTakenException;
@@ -16,9 +18,13 @@ import java.util.UUID;
 
 public class UserService {
 
-    DataAccess dataAccess;
+    private final DataAccess dataAccess;
+    private final AuthService authService;
 
-    public UserService(DataAccess dataAccess) {this.dataAccess = dataAccess;}
+    public UserService(DataAccess dataAccess, AuthService authService) {
+        this.dataAccess = dataAccess;
+        this.authService = authService;
+    }
 
     public RegisterResult register(RegisterRequest request) throws DataAccessException, BadRequestException, AlreadyTakenException {
         if (request == null || request.username() == null || request.password() == null || request.email() == null) {
@@ -50,6 +56,12 @@ public class UserService {
             dataAccess.createAuth(authData);
             return new LoginResult(request.username(), authData.authToken());
         }
+    }
+
+    public LogoutResult logout(LogoutRequest request) throws DataAccessException, UnauthorizedException {
+        authService.authenticate(request.authToken());
+        dataAccess.deleteAuth(request.authToken());
+        return new LogoutResult();
     }
 
     private AuthData createAuthFor(String username) {

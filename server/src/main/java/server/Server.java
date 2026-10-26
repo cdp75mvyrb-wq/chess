@@ -6,6 +6,7 @@ import dataaccess.MemoryDataAccess;
 import handler.UserHandler;
 import io.javalin.*;
 import io.javalin.http.Context;
+import service.AuthService;
 import service.ClearService;
 import handler.ClearHandler;
 import service.UserService;
@@ -22,17 +23,18 @@ public class Server {
     public Server() {
         javalin = Javalin.create(config -> config.staticFiles.add("web"));
         DataAccess dataAccess = new MemoryDataAccess();
-        // clear
         ClearService clearService = new ClearService(dataAccess);
         ClearHandler clearHandler = new ClearHandler(clearService);
-        javalin.delete("/db", clearHandler::clear);
-        // register
-        UserService userService = new UserService(dataAccess);
+        AuthService authService = new AuthService(dataAccess);
+        UserService userService = new UserService(dataAccess, authService);
         UserHandler userHandler = new UserHandler(userService);
         javalin.post("/user", userHandler::register);
-        // login
         javalin.post("/session", userHandler::login);
+        javalin.delete("/session", userHandler::logout);
+        javalin.delete("/db", clearHandler::clear);
+
         // exception handlers
+
         javalin.exception(BadRequestException.class,   (e, ctx) -> sendError(ctx, 400, e.getMessage()));
         javalin.exception(AlreadyTakenException.class, (e, ctx) -> sendError(ctx, 403, e.getMessage()));
         javalin.exception(DataAccessException.class,   (e, ctx) -> sendError(ctx, 500, e.getMessage()));

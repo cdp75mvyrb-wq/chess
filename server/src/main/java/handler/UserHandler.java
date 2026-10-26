@@ -4,18 +4,24 @@ import com.google.gson.Gson;
 import dataaccess.DataAccessException;
 import io.javalin.http.Context;
 import request.LoginRequest;
+import request.LogoutRequest;
 import request.RegisterRequest;
 import result.LoginResult;
+import result.LogoutResult;
 import result.RegisterResult;
+import service.AuthService;
 import service.ClearService;
 import service.UserService;
+import service.exception.UnauthorizedException;
 
 public class UserHandler {
 
-    UserService userService;
+    private final UserService userService;
     private final Gson gson = new Gson();
 
-    public UserHandler(UserService userService) {this.userService = userService;}
+    public UserHandler(UserService userService) {
+        this.userService = userService;
+    }
 
     public void register(Context ctx) throws DataAccessException {
         RegisterRequest request = gson.fromJson(ctx.body(), RegisterRequest.class);
@@ -29,5 +35,12 @@ public class UserHandler {
         LoginResult result = userService.login(request);
         ctx.status(200);
         ctx.result(gson.toJson(result));
+    }
+
+    public void logout(Context ctx) throws DataAccessException, UnauthorizedException {
+        LogoutRequest request = new LogoutRequest(ctx.header("authorization"));
+        LogoutResult result = userService.logout(request);
+        ctx.status(200);
+        ctx.result(gson. toJson(result));
     }
 }
