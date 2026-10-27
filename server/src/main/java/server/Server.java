@@ -38,6 +38,7 @@ public class Server {
         javalin.delete("/session", userHandler::logout);
         javalin.delete("/db", clearHandler::clear);
         javalin.post("/game", gameHandler::create);
+        javalin.get("/game", gameHandler::list);
 
         // exception handlers
 
