@@ -4,15 +4,15 @@ import com.google.gson.Gson;
 import dataaccess.DataAccessException;
 import io.javalin.http.Context;
 import org.jetbrains.annotations.NotNull;
-import request.CreateGameRequest;
-import request.ListGamesRequest;
-import request.LoginRequest;
-import request.RegisterRequest;
+import request.*;
 import result.CreateGameResult;
+import result.JoinGameResult;
 import result.ListGamesResult;
 import service.GameService;
 import service.exception.BadRequestException;
 import service.exception.UnauthorizedException;
+
+import javax.naming.AuthenticationException;
 
 public class GameHandler {
 
@@ -32,5 +32,10 @@ public class GameHandler {
         ListGamesResult result = gameService.listGames(ctx.header("authorization"));
         ctx.status(200);
         ctx.result(gson.toJson(result));
+    }
+
+    public void join(Context ctx) throws DataAccessException, BadRequestException, AuthenticationException {
+        JoinGameRequest request = gson.fromJson(ctx.body(), JoinGameRequest.class);
+        JoinGameResult result = gameService.joinGame(request, ctx.header("authorization"));
     }
 }

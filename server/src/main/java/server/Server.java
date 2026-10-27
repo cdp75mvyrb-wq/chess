@@ -39,6 +39,7 @@ public class Server {
         javalin.delete("/db", clearHandler::clear);
         javalin.post("/game", gameHandler::create);
         javalin.get("/game", gameHandler::list);
+        javalin.put("/game", gameHandler::join);
 
         // exception handlers
 
