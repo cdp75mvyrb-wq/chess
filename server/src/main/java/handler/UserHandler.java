@@ -9,8 +9,6 @@ import request.RegisterRequest;
 import result.LoginResult;
 import result.LogoutResult;
 import result.RegisterResult;
-import service.AuthService;
-import service.ClearService;
 import service.UserService;
 import service.exception.UnauthorizedException;
 
