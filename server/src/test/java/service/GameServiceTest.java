@@ -14,6 +14,7 @@ import result.CreateGameResult;
 import result.ListGamesResult;
 import service.exception.AlreadyTakenException;
 import service.exception.BadRequestException;
+import service.exception.UnauthorizedException;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -86,5 +87,14 @@ class GameServiceTest {
     void createAuthUser() {
         dataAccess.createUser(new UserData("sam", "1234", "bruh@gmail.com"));
         dataAccess.createAuth(new AuthData("1", "sam"));
+    }
+
+    @Test
+    void joinGameBadAuth() throws Exception {
+        createAuthUser();
+        CreateGameResult result = gameService.createGame(new CreateGameRequest("Game 1"), "1");
+        gameService.joinGame(new JoinGameRequest("WHITE", result.gameID()), "1");
+        assertThrows(UnauthorizedException.class,
+                () -> gameService.joinGame(new JoinGameRequest("BLACK", result.gameID()), "34"));
     }
 }
