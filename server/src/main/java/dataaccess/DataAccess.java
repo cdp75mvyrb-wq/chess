@@ -9,16 +9,16 @@ import java.util.Collection;
 public interface DataAccess {
     UserData getUser(String username) throws DataAccessException;
     AuthData getAuth(String authToken) throws DataAccessException;
-    GameData getGame(int gameID);
+    GameData getGame(int gameID) throws DataAccessException;
 
     Collection<GameData> listGames() throws DataAccessException;
 
     void updateGame(GameData gameData);
 
-    void createUser(UserData userData);
-    void createAuth(AuthData authData);
-    void deleteAuth(String authToken);
-    int createGame(String gameName);
+    void createUser(UserData userData) throws DataAccessException;
+    void createAuth(AuthData authData) throws DataAccessException;
+    void deleteAuth(String authToken) throws DataAccessException;
+    int createGame(String gameName) throws DataAccessException;
 
     void clearUsers() throws DataAccessException;
     void clearAuthTokens() throws DataAccessException;
