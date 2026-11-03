@@ -104,16 +104,25 @@ public class MySqlDataAccess implements DataAccess {
 
     @Override
     public void clearUsers() throws DataAccessException {
-
+        executeUpdate("TRUNCATE TABLE user", "Error: unable to clear users data");
     }
 
     @Override
     public void clearAuthTokens() throws DataAccessException {
-
+        executeUpdate("TRUNCATE TABLE auth", "Error: unable to clear auth data");
     }
 
     @Override
     public void clearGames() throws DataAccessException {
+        executeUpdate("TRUNCATE TABLE game", "Error: unable to clear games data");
+    }
 
+    void executeUpdate(String statement, String message) throws DataAccessException {
+        try (var conn = DatabaseManager.getConnection();
+             var ps = conn.prepareStatement(statement)) {
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            throw new DataAccessException(message, e);
+        }
     }
 }
