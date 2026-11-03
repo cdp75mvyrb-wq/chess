@@ -13,6 +13,7 @@ import model.UserData;
 import service.exception.AlreadyTakenException;
 import service.exception.BadRequestException;
 import service.exception.UnauthorizedException;
+import org.mindrot.jbcrypt.BCrypt;
 
 import java.util.UUID;
 
@@ -33,7 +34,8 @@ public class UserService {
         if (dataAccess.getUser(request.username()) != null) {
             throw new AlreadyTakenException("Error: username already taken");
         } else {
-            dataAccess.createUser(new UserData(request.username(), request.password(), request.email()));
+            String hashedPassword = BCrypt.hashpw(request.password(), BCrypt.gensalt());
+            dataAccess.createUser(new UserData(request.username(), hashedPassword, request.email()));
             AuthData authData = createAuthFor(request.username());
             dataAccess.createAuth(authData);
             return new RegisterResult(request.username(), authData.authToken());
@@ -44,12 +46,12 @@ public class UserService {
         if (request == null || request.username() == null || request.password() == null) {
             throw new BadRequestException("Error: bad request");
         }
-        if (dataAccess.getUser(request.username()) == null) {
+        UserData userData = dataAccess.getUser(request.username());
+        if (userData == null) {
             throw new UnauthorizedException("Error: unauthorized");
         }
         else {
-            UserData userData = dataAccess.getUser(request.username());
-            if (!userData.password().equals(request.password())) {
+            if (!BCrypt.checkpw(request.password(), userData.password())) {
                 throw new UnauthorizedException("Error: unauthorized");
             }
             AuthData authData = createAuthFor(request.username());
