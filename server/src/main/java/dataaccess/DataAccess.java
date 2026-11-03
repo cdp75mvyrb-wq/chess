@@ -13,7 +13,7 @@ public interface DataAccess {
 
     Collection<GameData> listGames() throws DataAccessException;
 
-    void updateGame(GameData gameData);
+    void updateGame(GameData gameData) throws DataAccessException;
 
     void createUser(UserData userData) throws DataAccessException;
     void createAuth(AuthData authData) throws DataAccessException;
