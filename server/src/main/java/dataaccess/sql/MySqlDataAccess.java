@@ -7,6 +7,7 @@ import model.AuthData;
 import model.GameData;
 import model.UserData;
 
+import java.sql.SQLException;
 import java.util.Collection;
 import java.util.List;
 
@@ -44,7 +45,16 @@ public class MySqlDataAccess implements DataAccess {
     }
 
     private void configureDatabase() throws DataAccessException {
-            DatabaseManager.createDatabase();
+        DatabaseManager.createDatabase();
+        try (var conn = DatabaseManager.getConnection()) {
+            for (String statement : createStatements) {
+                try (var preparedStatement = conn.prepareStatement(statement)) {
+                    preparedStatement.executeUpdate();
+                }
+            }
+        } catch (SQLException e) {
+            throw new DataAccessException("Error: unable to configure database", e);
+        }
     }
 
     @Override
