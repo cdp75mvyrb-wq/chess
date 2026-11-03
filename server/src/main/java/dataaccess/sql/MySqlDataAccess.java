@@ -11,17 +11,30 @@ import java.util.Collection;
 import java.util.List;
 
 public class MySqlDataAccess implements DataAccess {
+    private final String[] createStatements = {
+        """
+            CREATE TABLE IF NOT EXIST user (
+                username VARCHAR(255) NOT NULL,
+                password VARCHAR(255) NOT NULL,
+                email VARCHAR(255) NOT NULL,
+                PRIMARY KEY (username)
+            )
+        """,
+        """
+            CREATE TABLE IF NOT EXIST game (
+                gameID INT NOT NULL AUTO_INCREMENT,
+                whiteUsername VARCHAR(255),
+                blackUsername VARCHAR(255),
+                gameName VARCHAR(255) NOT NULL,
+                game TEXT NOT NULL,
+                PRIMARY KEY (gameName)
+            )
+        """
+    };
+
     public MySqlDataAccess () throws DataAccessException{
         configureDatabase();
     }
-
-    private final String[] createStatements = {
-        """
-        CREATE TABLE IF NOT EXIST user (
-            
-        )
-        """
-    };
 
     private void configureDatabase() throws DataAccessException {
             DatabaseManager.createDatabase();
