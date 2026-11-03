@@ -13,7 +13,7 @@ import java.util.List;
 public class MySqlDataAccess implements DataAccess {
     private final String[] createStatements = {
         """
-            CREATE TABLE IF NOT EXIST user (
+            CREATE TABLE IF NOT EXISTS user (
                 username VARCHAR(255) NOT NULL,
                 password VARCHAR(255) NOT NULL,
                 email VARCHAR(255) NOT NULL,
@@ -21,13 +21,20 @@ public class MySqlDataAccess implements DataAccess {
             )
         """,
         """
-            CREATE TABLE IF NOT EXIST game (
+            CREATE TABLE IF NOT EXISTS game (
                 gameID INT NOT NULL AUTO_INCREMENT,
                 whiteUsername VARCHAR(255),
                 blackUsername VARCHAR(255),
                 gameName VARCHAR(255) NOT NULL,
                 game TEXT NOT NULL,
-                PRIMARY KEY (gameName)
+                PRIMARY KEY (gameID)
+            )
+        """,
+        """
+            CREATE TABLE IF NOT EXISTS auth (
+                authToken VARCHAR(255) NOT NULL,
+                username VARCHAR(255) NOT NULL,
+                PRIMARY KEY (authToken)
             )
         """
     };
