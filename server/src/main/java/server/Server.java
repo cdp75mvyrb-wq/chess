@@ -3,6 +3,7 @@ import com.google.gson.Gson;
 import dataaccess.DataAccess;
 import dataaccess.DataAccessException;
 import dataaccess.MemoryDataAccess;
+import dataaccess.sql.MySqlDataAccess;
 import handler.GameHandler;
 import handler.UserHandler;
 import io.javalin.*;
@@ -25,7 +26,12 @@ public class Server {
 
     public Server() {
         javalin = Javalin.create(config -> config.staticFiles.add("web"));
-        DataAccess dataAccess = new MemoryDataAccess();
+        DataAccess dataAccess;
+        try {
+            dataAccess = new MySqlDataAccess();
+        } catch (DataAccessException e) {
+            throw new RuntimeException("Error: unable to initialize database", e);
+        }
         ClearService clearService = new ClearService(dataAccess);
         ClearHandler clearHandler = new ClearHandler(clearService);
         AuthService authService = new AuthService(dataAccess);
