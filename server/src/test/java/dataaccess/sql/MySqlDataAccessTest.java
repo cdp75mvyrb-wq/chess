@@ -69,4 +69,12 @@ class MySqlDataAccessTest {
         int gameID = dataAccess.createGame("sam's game");
         assertEquals("sam's game", dataAccess.getGame(gameID).gameName());
     }
+
+    @Test
+    void updateGame() throws DataAccessException {
+        int gameID = dataAccess.createGame("sam's game");
+        GameData originalData = dataAccess.getGame(gameID);
+        dataAccess.updateGame(new GameData(gameID, null, null, "game", originalData.game()));
+        assertEquals("game", dataAccess.getGame(gameID).gameName());
+    }
 }

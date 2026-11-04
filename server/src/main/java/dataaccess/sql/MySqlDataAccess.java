@@ -57,7 +57,7 @@ public class MySqlDataAccess implements DataAccess {
                     preparedStatement.executeUpdate();
                 }
             }
-        } catch (SQLException e) {
+;        } catch (SQLException e) {
             throw new DataAccessException("Error: unable to configure database", e);
         }
     }
@@ -117,7 +117,7 @@ public class MySqlDataAccess implements DataAccess {
 
     @Override
     public void updateGame(GameData gameData) throws DataAccessException {
-
+        executeUpdate("UPDATE game SET gameID = ?, whiteUsername = ?, blackUsername = ?, gameName = ?, game = ? WHERE gameID = ?" , "Error: unable to update game data", gameData.gameID(), gameData.whiteUsername(), gameData.blackUsername(), gameData.gameName(), gameData.game(), gameData.gameID());
     }
 
     @Override
