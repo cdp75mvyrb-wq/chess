@@ -10,6 +10,7 @@ import model.GameData;
 import model.UserData;
 
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.Collection;
 import java.util.List;
 
@@ -105,7 +106,7 @@ public class MySqlDataAccess implements DataAccess {
                 return null;
             }
         } catch (SQLException e) {
-            throw new DataAccessException("Error: unable to get authentication", e);
+            throw new DataAccessException("Error: unable to get game", e);
         }
     }
 
@@ -131,12 +132,13 @@ public class MySqlDataAccess implements DataAccess {
 
     @Override
     public void deleteAuth(String authToken) throws DataAccessException {
-
+        executeUpdate("DELETE FROM auth WHERE authToken = ?", "Error: unable to delete auth data", authToken);
     }
 
     @Override
     public int createGame(String gameName) throws DataAccessException {
-
+        String gameJson = gson.toJson(new ChessGame());
+        return executeUpdate("INSERT INTO game (gameName, game) VALUES (?, ?)", "Error: unable to create game", gameName, gameJson);
     }
 
     @Override
@@ -154,13 +156,19 @@ public class MySqlDataAccess implements DataAccess {
         executeUpdate("TRUNCATE TABLE game", "Error: unable to clear games data");
     }
 
-    void executeUpdate(String statement, String message, Object... params) throws DataAccessException {
+    private int executeUpdate(String statement, String message, Object... params) throws DataAccessException {
         try (var conn = DatabaseManager.getConnection();
-            var ps = conn.prepareStatement(statement)) {
+             var ps = conn.prepareStatement(statement, Statement.RETURN_GENERATED_KEYS)) {
             for (int i = 0; i < params.length; i++) {
                 ps.setObject(i + 1, params[i]);
             }
             ps.executeUpdate();
+            try (var keys = ps.getGeneratedKeys()) {
+                if (keys.next()) {
+                    return keys.getInt(1);
+                }
+                return 0;
+            }
         } catch (SQLException e) {
             throw new DataAccessException(message, e);
         }

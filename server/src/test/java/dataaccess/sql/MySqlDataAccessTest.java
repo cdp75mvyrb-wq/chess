@@ -2,9 +2,12 @@ package dataaccess.sql;
 
 import dataaccess.DataAccessException;
 import model.AuthData;
+import model.GameData;
 import model.UserData;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+import javax.xml.crypto.Data;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -14,6 +17,9 @@ class MySqlDataAccessTest {
     @BeforeEach
     void setup() throws DataAccessException {
         dataAccess = new MySqlDataAccess();
+        dataAccess.clearAuthTokens();
+        dataAccess.clearUsers();
+        dataAccess.clearGames();
     }
 
     @Test
@@ -45,8 +51,22 @@ class MySqlDataAccessTest {
         assertEquals("sam", dataAccess.getAuth("hello").username());
     }
 
+    @Test
+    void addDeleteAuth() throws DataAccessException {
+        assertDoesNotThrow(() -> dataAccess.createAuth(new AuthData("hello", "sam")));
+        assertDoesNotThrow(() -> dataAccess.deleteAuth("hello"));
+        assertNull(dataAccess.getAuth("hello"));
+    }
+
+    @Test
     void addGetUser() throws DataAccessException {
         assertDoesNotThrow(() -> dataAccess.createUser(new UserData("hello", "sam", "byu@edu")));
-        assertEquals("byu.edu", dataAccess.getUser("hello").email());
+        assertEquals("byu@edu", dataAccess.getUser("hello").email());
+    }
+
+    @Test
+    void createGetGame() throws DataAccessException {
+        int gameID = dataAccess.createGame("sam's game");
+        assertEquals("sam's game", dataAccess.getGame(gameID).gameName());
     }
 }
