@@ -30,20 +30,17 @@ class MySqlDataAccessTest {
 
     @Test
     void clearUserSuccess() throws DataAccessException {
-        var DAO = new MySqlDataAccess();
-        assertDoesNotThrow(() -> DAO.clearUsers());
+        assertDoesNotThrow(() -> dataAccess.clearUsers());
     }
 
     @Test
     void clearAuthSuccess() throws DataAccessException {
-        var DAO = new MySqlDataAccess();
-        assertDoesNotThrow(() -> DAO.clearAuthTokens());
+        assertDoesNotThrow(() -> dataAccess.clearAuthTokens());
     }
 
     @Test
     void clearGameSuccess() throws DataAccessException {
-        var DAO = new MySqlDataAccess();
-        assertDoesNotThrow(() -> DAO.clearGames());
+        assertDoesNotThrow(() -> dataAccess.clearGames());
     }
 
     @Test

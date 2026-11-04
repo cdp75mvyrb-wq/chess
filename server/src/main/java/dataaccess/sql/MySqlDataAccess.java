@@ -17,7 +17,7 @@ import java.util.List;
 
 public class MySqlDataAccess implements DataAccess {
     private final String[] createStatements = {
-        """
+            """
             CREATE TABLE IF NOT EXISTS user (
                 username VARCHAR(255) NOT NULL,
                 password VARCHAR(255) NOT NULL,
@@ -25,7 +25,7 @@ public class MySqlDataAccess implements DataAccess {
                 PRIMARY KEY (username)
             )
         """,
-        """
+            """
             CREATE TABLE IF NOT EXISTS game (
                 gameID INT NOT NULL AUTO_INCREMENT,
                 whiteUsername VARCHAR(255),
@@ -35,7 +35,7 @@ public class MySqlDataAccess implements DataAccess {
                 PRIMARY KEY (gameID)
             )
         """,
-        """
+            """
             CREATE TABLE IF NOT EXISTS auth (
                 authToken VARCHAR(255) NOT NULL,
                 username VARCHAR(255) NOT NULL,
@@ -46,7 +46,7 @@ public class MySqlDataAccess implements DataAccess {
 
     private final Gson gson = new Gson();
 
-    public MySqlDataAccess () throws DataAccessException{
+    public MySqlDataAccess() throws DataAccessException {
         configureDatabase();
     }
 
@@ -58,7 +58,8 @@ public class MySqlDataAccess implements DataAccess {
                     preparedStatement.executeUpdate();
                 }
             }
-;        } catch (SQLException e) {
+            ;
+        } catch (SQLException e) {
             throw new DataAccessException("Error: unable to configure database", e);
         }
     }
@@ -82,7 +83,7 @@ public class MySqlDataAccess implements DataAccess {
     @Override
     public AuthData getAuth(String authToken) throws DataAccessException {
         try (var conn = DatabaseManager.getConnection();
-            var ps = conn.prepareStatement("SELECT authToken, username FROM auth WHERE authToken = ?")) {
+             var ps = conn.prepareStatement("SELECT authToken, username FROM auth WHERE authToken = ?")) {
             ps.setString(1, authToken);
             try (var rs = ps.executeQuery()) {
                 if (rs.next()) {
@@ -102,7 +103,12 @@ public class MySqlDataAccess implements DataAccess {
             ps.setInt(1, gameID);
             try (var rs = ps.executeQuery()) {
                 if (rs.next()) {
-                    return new GameData(rs.getInt(1), rs.getString(2), rs.getString(3), rs.getString(4), gson.fromJson(rs.getString("game"), ChessGame.class));
+                    return new GameData(rs.getInt(1),
+                            rs.getString(2),
+                            rs.getString(3),
+                            rs.getString(4),
+                            gson.fromJson(rs.getString("game"),
+                                    ChessGame.class));
                 }
                 return null;
             }
@@ -118,7 +124,12 @@ public class MySqlDataAccess implements DataAccess {
              var ps = conn.prepareStatement("SELECT * FROM game")) {
             try (var rs = ps.executeQuery()) {
                 while (rs.next()) {
-                    games.add(new GameData(rs.getInt(1), rs.getString(2), rs.getString(3), rs.getString(4), gson.fromJson(rs.getString(5), ChessGame.class)));
+                    games.add(new GameData(rs.getInt(1),
+                            rs.getString(2),
+                            rs.getString(3),
+                            rs.getString(4),
+                            gson.fromJson(rs.getString(5),
+                                    ChessGame.class)));
                 }
                 return games;
             }
@@ -129,17 +140,27 @@ public class MySqlDataAccess implements DataAccess {
 
     @Override
     public void updateGame(GameData gameData) throws DataAccessException {
-        executeUpdate("UPDATE game SET whiteUsername = ?, blackUsername = ?, gameName = ?, game = ? WHERE gameID = ?" , "Error: unable to update game data", gameData.whiteUsername(), gameData.blackUsername(), gameData.gameName(), gson.toJson(gameData.game()), gameData.gameID());
+        executeUpdate("UPDATE game SET whiteUsername = ?, blackUsername = ?, gameName = ?, game = ? WHERE gameID = ?", "Error: unable to update game data",
+                gameData.whiteUsername(),
+                gameData.blackUsername(),
+                gameData.gameName(),
+                gson.toJson(gameData.game()),
+                gameData.gameID());
     }
 
     @Override
     public void createUser(UserData userData) throws DataAccessException {
-        executeUpdate("INSERT INTO user (username, password, email) VALUES (?, ?, ?)", "Error: unable to add user data", userData.username(), userData.password(), userData.email());
+        executeUpdate("INSERT INTO user (username, password, email) VALUES (?, ?, ?)", "Error: unable to add user data",
+                userData.username(),
+                userData.password(),
+                userData.email());
     }
 
     @Override
     public void createAuth(AuthData authData) throws DataAccessException {
-        executeUpdate("INSERT INTO auth (authToken, username) VALUES (?, ?)", "Error: unable to add authentication data", authData.authToken(), authData.username());
+        executeUpdate("INSERT INTO auth (authToken, username) VALUES (?, ?)", "Error: unable to add authentication data",
+                authData.authToken(),
+                authData.username());
     }
 
     @Override
