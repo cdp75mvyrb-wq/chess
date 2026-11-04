@@ -7,6 +7,8 @@ import model.GameData;
 import model.UserData;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import request.JoinGameRequest;
+import service.exception.UnauthorizedException;
 
 import java.util.Collection;
 
@@ -66,6 +68,11 @@ class MySqlDataAccessTest {
     void createGetGame() throws DataAccessException {
         int gameID = dataAccess.createGame("sam's game");
         assertEquals("sam's game", dataAccess.getGame(gameID).gameName());
+    }
+
+    @Test
+    void getGameFail() throws DataAccessException {
+        assertNull(dataAccess.getGame(123));
     }
 
     @Test
