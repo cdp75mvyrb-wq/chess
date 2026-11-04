@@ -1,5 +1,6 @@
 package dataaccess.sql;
 
+import chess.ChessGame;
 import dataaccess.DataAccessException;
 import model.AuthData;
 import model.GameData;
@@ -7,7 +8,7 @@ import model.UserData;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import javax.xml.crypto.Data;
+import java.util.Collection;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -76,5 +77,17 @@ class MySqlDataAccessTest {
         GameData originalData = dataAccess.getGame(gameID);
         dataAccess.updateGame(new GameData(gameID, null, null, "game", originalData.game()));
         assertEquals("game", dataAccess.getGame(gameID).gameName());
+    }
+
+    @Test
+    void getGamesCorrect() throws DataAccessException {
+        int id1 = dataAccess.createGame("game 1");
+        int id2 = dataAccess.createGame("game 2");
+        int id3 = dataAccess.createGame("game 3");
+        Collection<GameData> games = dataAccess.listGames();
+        assertEquals(3, games.size());
+        assertTrue(games.contains(new GameData(id1, null, null, "game 1", new ChessGame())));
+        assertTrue(games.contains(new GameData(id2, null, null, "game 2", new ChessGame())));
+        assertTrue(games.contains(new GameData(id3, null, null, "game 3", new ChessGame())));
     }
 }

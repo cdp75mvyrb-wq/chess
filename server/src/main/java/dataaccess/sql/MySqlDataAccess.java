@@ -11,6 +11,7 @@ import model.UserData;
 
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -112,12 +113,23 @@ public class MySqlDataAccess implements DataAccess {
 
     @Override
     public Collection<GameData> listGames() throws DataAccessException {
-        return List.of();
+        Collection<GameData> games = new ArrayList<>();
+        try (var conn = DatabaseManager.getConnection();
+             var ps = conn.prepareStatement("SELECT * FROM game")) {
+            try (var rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    games.add(new GameData(rs.getInt(1), rs.getString(2), rs.getString(3), rs.getString(4), gson.fromJson(rs.getString(5), ChessGame.class)));
+                }
+                return games;
+            }
+        } catch (SQLException e) {
+            throw new DataAccessException("Error: unable to get game", e);
+        }
     }
 
     @Override
     public void updateGame(GameData gameData) throws DataAccessException {
-        executeUpdate("UPDATE game SET gameID = ?, whiteUsername = ?, blackUsername = ?, gameName = ?, game = ? WHERE gameID = ?" , "Error: unable to update game data", gameData.gameID(), gameData.whiteUsername(), gameData.blackUsername(), gameData.gameName(), gameData.game(), gameData.gameID());
+        executeUpdate("UPDATE game SET whiteUsername = ?, blackUsername = ?, gameName = ?, game = ? WHERE gameID = ?" , "Error: unable to update game data", gameData.whiteUsername(), gameData.blackUsername(), gameData.gameName(), gson.toJson(gameData.game()), gameData.gameID());
     }
 
     @Override
