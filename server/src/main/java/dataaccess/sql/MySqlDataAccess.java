@@ -1,5 +1,7 @@
 package dataaccess.sql;
 
+import chess.ChessGame;
+import com.google.gson.Gson;
 import dataaccess.DataAccess;
 import dataaccess.DataAccessException;
 import dataaccess.DatabaseManager;
@@ -40,6 +42,8 @@ public class MySqlDataAccess implements DataAccess {
         """
     };
 
+    private final Gson gson = new Gson();
+
     public MySqlDataAccess () throws DataAccessException{
         configureDatabase();
     }
@@ -59,17 +63,50 @@ public class MySqlDataAccess implements DataAccess {
 
     @Override
     public UserData getUser(String username) throws DataAccessException {
-        return null;
+        try (var conn = DatabaseManager.getConnection();
+             var ps = conn.prepareStatement("SELECT * FROM user WHERE username = ?")) {
+            ps.setString(1, username);
+            try (var rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return new UserData(rs.getString(1), rs.getString(2), rs.getString(3));
+                }
+                return null;
+            }
+        } catch (SQLException e) {
+            throw new DataAccessException("Error: unable to get user", e);
+        }
     }
 
     @Override
     public AuthData getAuth(String authToken) throws DataAccessException {
-        return null;
+        try (var conn = DatabaseManager.getConnection();
+            var ps = conn.prepareStatement("SELECT authToken, username FROM auth WHERE authToken = ?")) {
+            ps.setString(1, authToken);
+            try (var rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return new AuthData(rs.getString(1), rs.getString(2));
+                }
+                return null;
+            }
+        } catch (SQLException e) {
+            throw new DataAccessException("Error: unable to get authentication", e);
+        }
     }
 
     @Override
     public GameData getGame(int gameID) throws DataAccessException {
-        return null;
+        try (var conn = DatabaseManager.getConnection();
+             var ps = conn.prepareStatement("SELECT * FROM game WHERE gameID = ?")) {
+            ps.setInt(1, gameID);
+            try (var rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return new GameData(rs.getInt(1), rs.getString(2), rs.getString(3), rs.getString(4), gson.fromJson(rs.getString("game"), ChessGame.class));
+                }
+                return null;
+            }
+        } catch (SQLException e) {
+            throw new DataAccessException("Error: unable to get authentication", e);
+        }
     }
 
     @Override
@@ -84,12 +121,12 @@ public class MySqlDataAccess implements DataAccess {
 
     @Override
     public void createUser(UserData userData) throws DataAccessException {
-
+        executeUpdate("INSERT INTO user (username, password, email) VALUES (?, ?, ?)", "Error: unable to add user data", userData.username(), userData.password(), userData.email());
     }
 
     @Override
     public void createAuth(AuthData authData) throws DataAccessException {
-
+        executeUpdate("INSERT INTO auth (authToken, username) VALUES (?, ?)", "Error: unable to add authentication data", authData.authToken(), authData.username());
     }
 
     @Override
@@ -99,7 +136,7 @@ public class MySqlDataAccess implements DataAccess {
 
     @Override
     public int createGame(String gameName) throws DataAccessException {
-        return 0;
+
     }
 
     @Override
@@ -117,9 +154,12 @@ public class MySqlDataAccess implements DataAccess {
         executeUpdate("TRUNCATE TABLE game", "Error: unable to clear games data");
     }
 
-    void executeUpdate(String statement, String message) throws DataAccessException {
+    void executeUpdate(String statement, String message, Object... params) throws DataAccessException {
         try (var conn = DatabaseManager.getConnection();
-             var ps = conn.prepareStatement(statement)) {
+            var ps = conn.prepareStatement(statement)) {
+            for (int i = 0; i < params.length; i++) {
+                ps.setObject(i + 1, params[i]);
+            }
             ps.executeUpdate();
         } catch (SQLException e) {
             throw new DataAccessException(message, e);
