@@ -1,17 +1,16 @@
 package client;
 
+import result.LoginResult;
 import result.RegisterResult;
-
-import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
 
 public class ClientMain {
     public static void main(String[] args) throws Exception {
         String hardcodedURL = "http://localhost:8080";
         ServerFacade serverFacade = new ServerFacade(hardcodedURL);
-        RegisterResult result = serverFacade.register("sam", "1234", "sam@byu.edu");
-        System.out.println("Authentication token: " + result.authToken());
+        RegisterResult registerResult = serverFacade.register("sam", "1234", "sam@byu.edu");
+        System.out.println("Authentication token: " + registerResult.authToken());
+
+        LoginResult loginResult = serverFacade.login("sam", "1234");
+        System.out.println("Authentication token: " + loginResult.authToken());
     }
 }
