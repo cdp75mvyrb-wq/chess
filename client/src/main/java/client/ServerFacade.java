@@ -7,8 +7,10 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import com.google.gson.Gson;
 import request.LoginRequest;
+import request.LogoutRequest;
 import request.RegisterRequest;
 import result.LoginResult;
+import result.LogoutResult;
 import result.RegisterResult;
 
 public class ServerFacade {
@@ -31,6 +33,7 @@ public class ServerFacade {
                 .build();
 
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        SuccessCheck(response);
         return gson.fromJson(response.body(), RegisterResult.class);
     }
 
@@ -45,6 +48,25 @@ public class ServerFacade {
                 .build();
 
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        SuccessCheck(response);
         return gson.fromJson(response.body(), LoginResult.class);
+    }
+
+    public LogoutResult logout(String authToken) throws Exception {
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(serverURL + "/session"))
+                .header("authorization", authToken)
+                .DELETE()
+                .build();
+
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        SuccessCheck(response);
+        return new LogoutResult();
+    }
+
+    private void SuccessCheck(HttpResponse<String> response) throws Exception {
+        if (response.statusCode() != 200) {
+            throw new Exception(response.body());
+        }
     }
 }
