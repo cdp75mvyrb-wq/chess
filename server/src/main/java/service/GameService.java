@@ -5,7 +5,6 @@ import dataaccess.DataAccessException;
 import model.GameData;
 import request.CreateGameRequest;
 import request.JoinGameRequest;
-import request.ListGamesRequest;
 import result.CreateGameResult;
 import result.JoinGameResult;
 import result.ListGamesResult;

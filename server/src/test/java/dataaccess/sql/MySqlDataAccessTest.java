@@ -7,8 +7,6 @@ import model.GameData;
 import model.UserData;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import request.JoinGameRequest;
-import service.exception.UnauthorizedException;
 
 import java.util.Collection;
 

@@ -3,8 +3,6 @@ package service;
 import dataaccess.DataAccess;
 import dataaccess.DataAccessException;
 import model.AuthData;
-import request.LogoutRequest;
-import result.LogoutResult;
 import service.exception.UnauthorizedException;
 
 public class AuthService {

@@ -1,7 +1,6 @@
 package dataaccess;
 
 import chess.ChessGame;
-import com.sun.security.jgss.AuthorizationDataEntry;
 import model.AuthData;
 import model.GameData;
 import model.UserData;
