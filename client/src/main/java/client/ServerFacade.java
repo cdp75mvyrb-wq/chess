@@ -1,0 +1,34 @@
+package client;
+
+import java.io.IOException;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import com.google.gson.Gson;
+import request.RegisterRequest;
+import result.RegisterResult;
+
+public class ServerFacade {
+    public final HttpClient client = HttpClient.newHttpClient();
+    private final Gson gson = new Gson();
+    private final String serverURL;
+
+    public ServerFacade(String serverURL) {
+        this.serverURL = serverURL;
+    }
+
+    public RegisterResult register(String username, String password, String email) throws Exception {
+        RegisterRequest registerRequest = new RegisterRequest(username, password, email);
+        String json = gson.toJson(registerRequest);
+
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(serverURL + "/user"))
+                .header("Content-Type", "application/json")
+                .POST(HttpRequest.BodyPublishers.ofString(json))
+                .build();
+
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        return gson.fromJson(response.body(), RegisterResult.class);
+    }
+}
