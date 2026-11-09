@@ -7,7 +7,6 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import com.google.gson.Gson;
 import request.LoginRequest;
-import request.LogoutRequest;
 import request.RegisterRequest;
 import result.LoginResult;
 import result.LogoutResult;
@@ -20,6 +19,17 @@ public class ServerFacade {
 
     public ServerFacade(String serverURL) {
         this.serverURL = serverURL;
+    }
+
+    public void clear() throws Exception {
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(serverURL + "/db"))
+                .header("Content-Type", "application/json")
+                .DELETE()
+                .build();
+
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        SuccessCheck(response);
     }
 
     public RegisterResult register(String username, String password, String email) throws Exception {
