@@ -1,6 +1,5 @@
 package client;
 
-import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -13,7 +12,7 @@ import request.RegisterRequest;
 import result.*;
 
 public class ServerFacade {
-    public final HttpClient client = HttpClient.newHttpClient();
+    private final HttpClient client = HttpClient.newHttpClient();
     private final Gson gson = new Gson();
     private final String serverURL;
 
@@ -29,7 +28,7 @@ public class ServerFacade {
                 .build();
 
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-        SuccessCheck(response);
+        successCheck(response);
     }
 
     public RegisterResult register(String username, String password, String email) throws Exception {
@@ -43,7 +42,7 @@ public class ServerFacade {
                 .build();
 
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-        SuccessCheck(response);
+        successCheck(response);
         return gson.fromJson(response.body(), RegisterResult.class);
     }
 
@@ -58,11 +57,11 @@ public class ServerFacade {
                 .build();
 
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-        SuccessCheck(response);
+        successCheck(response);
         return gson.fromJson(response.body(), LoginResult.class);
     }
 
-    public LogoutResult logout(String authToken) throws Exception {
+    public void logout(String authToken) throws Exception {
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(serverURL + "/session"))
                 .header("authorization", authToken)
@@ -70,8 +69,7 @@ public class ServerFacade {
                 .build();
 
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-        SuccessCheck(response);
-        return new LogoutResult();
+        successCheck(response);
     }
 
     public ListGamesResult listGames(String authToken) throws Exception {
@@ -82,7 +80,7 @@ public class ServerFacade {
                 .build();
 
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-        SuccessCheck(response);
+        successCheck(response);
         return gson.fromJson(response.body(), ListGamesResult.class);
     }
 
@@ -97,7 +95,7 @@ public class ServerFacade {
                 .build();
 
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-        SuccessCheck(response);
+        successCheck(response);
         return gson.fromJson(response.body(), CreateGameResult.class);
     }
 
@@ -112,13 +110,16 @@ public class ServerFacade {
                 .build();
 
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-        SuccessCheck(response);
+        successCheck(response);
         return gson.fromJson(response.body(), JoinGameResult.class);
     }
 
-    private void SuccessCheck(HttpResponse<String> response) throws Exception {
-        if (response.statusCode() != 200) {
-            throw new Exception(response.body());
-        }
+    private void successCheck(HttpResponse<String> response) throws Exception {
+        int code = response.statusCode();
+        if (code == 200) {return;}
+        if (code == 400) {throw new Exception("Your credentials were not inputted correctly");}
+        if (code == 401) {throw new Exception("Your credentials are incorrect");}
+        if (code == 403) {throw new Exception("Your request is already taken");}
+        throw new Exception("Something went wrong with the server. Please try again");
     }
 }
