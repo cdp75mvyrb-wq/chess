@@ -1,12 +1,9 @@
 package client;
 
 import org.junit.jupiter.api.*;
-import result.LoginResult;
-import result.RegisterResult;
 import server.Server;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import service.exception.BadRequestException;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -68,6 +65,12 @@ public class ServerFacadeTests {
         facade.register("sam", "1234", "sam@byu.edu");
         assertThrows(Exception.class,
                 () -> facade.logout("wrong authToken"));
+    }
+
+    @Test
+    void logoutSuccess() throws Exception {
+        String authToken = facade.register("sam", "1234", "sam@byu.edu").authToken();
+        assertDoesNotThrow(() -> facade.logout(authToken));
     }
 
     @Test
