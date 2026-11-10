@@ -69,4 +69,31 @@ public class ServerFacadeTests {
         assertThrows(Exception.class,
                 () -> facade.logout("wrong authToken"));
     }
+
+    @Test
+    void createGameSuccess() throws Exception {
+        String authToken = facade.register("sam", "1234", "sam@byu.edu").authToken();
+        assertDoesNotThrow(() -> facade.createGame(authToken, "game"));
+    }
+
+    @Test
+    void createGameFail() throws Exception {
+        facade.register("sam", "1234", "sam@byu.edu").authToken();
+        assertThrows(Exception.class,
+                () -> facade.createGame("wrong authToken", "game1"));
+    }
+
+    @Test
+    void joinGameSuccess() throws Exception {
+        String authToken = facade.register("sam", "1234", "sam@byu.edu").authToken();
+        int gameID = facade.createGame(authToken, "game").gameID();
+        assertDoesNotThrow(() -> facade.joinGame(authToken, "WHITE", gameID));
+    }
+
+    @Test
+    void joinGameWrongColor() throws Exception {
+        String authToken = facade.register("sam", "1234", "sam@byu.edu").authToken();
+        int gameID = facade.createGame(authToken, "game").gameID();
+        assertThrows(Exception.class, () -> facade.joinGame(authToken, "PURPLE", gameID));
+    }
 }

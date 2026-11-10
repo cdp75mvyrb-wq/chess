@@ -6,11 +6,11 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import com.google.gson.Gson;
+import request.CreateGameRequest;
+import request.JoinGameRequest;
 import request.LoginRequest;
 import request.RegisterRequest;
-import result.LoginResult;
-import result.LogoutResult;
-import result.RegisterResult;
+import result.*;
 
 public class ServerFacade {
     public final HttpClient client = HttpClient.newHttpClient();
@@ -72,6 +72,48 @@ public class ServerFacade {
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
         SuccessCheck(response);
         return new LogoutResult();
+    }
+
+    public ListGamesResult listGames(String authToken) throws Exception {
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(serverURL + "/game"))
+                .header("authorization", authToken)
+                .GET()
+                .build();
+
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        SuccessCheck(response);
+        return gson.fromJson(response.body(), ListGamesResult.class);
+    }
+
+    public CreateGameResult createGame(String authToken, String gameName) throws Exception {
+        CreateGameRequest createGameRequest = new CreateGameRequest(gameName);
+        String json = gson.toJson(createGameRequest);
+
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(serverURL + "/game"))
+                .header("authorization", authToken)
+                .POST(HttpRequest.BodyPublishers.ofString(json))
+                .build();
+
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        SuccessCheck(response);
+        return gson.fromJson(response.body(), CreateGameResult.class);
+    }
+
+    public JoinGameResult joinGame(String authToken, String color, int gameID) throws Exception {
+        JoinGameRequest joinGameRequest = new JoinGameRequest(color, gameID);
+        String json = gson.toJson(joinGameRequest);
+
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(serverURL + "/game"))
+                .header("authorization", authToken)
+                .PUT(HttpRequest.BodyPublishers.ofString(json))
+                .build();
+
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        SuccessCheck(response);
+        return gson.fromJson(response.body(), JoinGameResult.class);
     }
 
     private void SuccessCheck(HttpResponse<String> response) throws Exception {
