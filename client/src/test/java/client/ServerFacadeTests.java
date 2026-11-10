@@ -96,4 +96,23 @@ public class ServerFacadeTests {
         int gameID = facade.createGame(authToken, "game").gameID();
         assertThrows(Exception.class, () -> facade.joinGame(authToken, "PURPLE", gameID));
     }
+
+    @Test
+    void listGamesSuccess() throws Exception {
+        String authToken = facade.register("sam", "1234", "sam@byu.edu").authToken();
+        facade.createGame(authToken, "game1").gameID();
+        facade.createGame(authToken, "game2").gameID();
+        facade.createGame(authToken, "game3").gameID();
+        assertDoesNotThrow(() -> facade.listGames(authToken));
+    }
+
+    @Test
+    void listGamesFail() throws Exception {
+        String authToken = facade.register("sam", "1234", "sam@byu.edu").authToken();
+        facade.createGame(authToken, "game1").gameID();
+        facade.createGame(authToken, "game2").gameID();
+        facade.createGame(authToken, "game3").gameID();
+        assertThrows(Exception.class,
+                () -> facade.listGames("bad authToken"));
+    }
 }

@@ -5,7 +5,5 @@ public class ClientMain {
         String hardcodedURL = "http://localhost:8080";
         ServerFacade serverFacade = new ServerFacade(hardcodedURL);
 
-        serverFacade.clear();
-
     }
 }
