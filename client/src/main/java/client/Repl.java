@@ -7,6 +7,7 @@ import result.LoginResult;
 import result.RegisterResult;
 import ui.BoardPrinter;
 
+import static chess.ChessGame.TeamColor.*;
 import static ui.EscapeSequences.*;
 
 import java.util.*;
@@ -86,7 +87,7 @@ public class Repl {
         if (id < 1 || id > lastListedGames.size()) {
             return "ID does not exist.\nType 'list' to see possible games to observe.";
         }
-        return BoardPrinter.draw(lastListedGames.get(id - 1).game().getBoard(), "WHITE");
+        return BoardPrinter.draw(lastListedGames.get(id - 1).game().getBoard(), WHITE);
     }
 
     private String join(String[] params) {
