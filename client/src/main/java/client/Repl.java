@@ -11,7 +11,7 @@ public class Repl {
     private final ServerFacade facade;
     private String authToken = null;
     private String username = null;
-    private Collection<GameData> lastListedGames = new ArrayList<>();
+    private ArrayList<GameData> lastListedGames = new ArrayList<>();
 
     public Repl(String serverUrl) {
         facade = new ServerFacade(serverUrl);
@@ -69,7 +69,7 @@ public class Repl {
         if (id < 1 || id > lastListedGames.size()) {
             return "ID does not exist.\nType 'list' to see possible games to observe.";
         }
-        return "List games now";
+        return lastListedGames.get(id - 1).game().getBoard().toString();
     }
 
     private String join(String[] params) {
@@ -77,14 +77,14 @@ public class Repl {
     }
 
     private String list() throws Exception {
-        System.out.println("Current active games:");
-        this.lastListedGames = facade.listGames(authToken).games();
+        System.out.println("- CURRENT ACTIVE GAMES -");
+        this.lastListedGames = new ArrayList<>(facade.listGames(authToken).games());
         int index = 1;
         for (GameData game : lastListedGames) {
             System.out.println(index + ": " + game.gameName());
             index += 1;
         }
-        return "END OF LIST";
+        return "- END OF LIST -";
     }
 
     private String create(String[] params) throws Exception {
