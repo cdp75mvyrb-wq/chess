@@ -3,6 +3,7 @@ package client;
 import chess.ChessBoard;
 import model.GameData;
 import result.CreateGameResult;
+import result.JoinGameResult;
 import result.LoginResult;
 import result.RegisterResult;
 import ui.BoardPrinter;
@@ -59,10 +60,7 @@ public class Repl {
                     case "login" -> login(params);
                     case "help" -> help();
                     case "quit" -> "quit";
-                    default -> """
-                            Your input could not be interpreted!
-                            Type "help" to see possible commands
-                            """;
+                    default -> help();
                 };
             }
             //logged in
@@ -87,28 +85,38 @@ public class Repl {
         if (id < 1 || id > lastListedGames.size()) {
             return "ID does not exist.\nType 'list' to see possible games to observe.";
         }
-        return BoardPrinter.draw(lastListedGames.get(id - 1).game().getBoard(), WHITE) +
-                BoardPrinter.draw(lastListedGames.get(id - 1).game().getBoard(), BLACK);
+        return BoardPrinter.draw(lastListedGames.get(id - 1).game().getBoard(), WHITE);
     }
 
-    private String join(String[] params) {
-        //check color input
+    private String join(String[] params) throws Exception {
+        if (params.length != 2) {return "Incorrect formatting.\nFormat: join <ID> [WHITE|BLACK]\nType 'list' to see possible games to join.";}
+        int id = Integer.parseInt(params[0]);
+        if (id < 1 || id > lastListedGames.size()) {
+            return "ID does not exist.\nType 'list' to see possible games to join.";
+        }
+        GameData game = lastListedGames.get(id - 1);
         String color = params[1].toUpperCase();
         if (!color.equals("WHITE") && !color.equals("BLACK")) {
             return "Color must be WHITE or BLACK.";
         }
-        return null;
+        facade.joinGame(authToken, color, game.gameID());
+        return BoardPrinter.draw(game.game().getBoard(), WHITE);
     }
 
     private String list() throws Exception {
-        System.out.println("- CURRENT ACTIVE GAMES -");
         this.lastListedGames = new ArrayList<>(facade.listGames(authToken).games());
+        if (lastListedGames.isEmpty()) {return "- NO CURRENT ACTIVE GAMES -";}
+        System.out.println("- CURRENT ACTIVE GAMES -");
         int index = 1;
         for (GameData game : lastListedGames) {
+            String whiteUser = game.whiteUsername() == null ? SET_TEXT_COLOR_GREEN + "OPEN" + RESET_TEXT_COLOR : SET_TEXT_COLOR_RED + game.whiteUsername() + RESET_TEXT_COLOR;
+            String blackUser = game.blackUsername() == null ? SET_TEXT_COLOR_GREEN + "OPEN" + RESET_TEXT_COLOR : SET_TEXT_COLOR_RED + game.blackUsername() + RESET_TEXT_COLOR;
             System.out.println(index + ": " + game.gameName());
+            System.out.println("   White: " + whiteUser);
+            System.out.println("   Black: " + blackUser);
             index += 1;
         }
-        return "- END OF LIST -";
+        return "";
     }
 
     private String create(String[] params) throws Exception {
@@ -119,6 +127,7 @@ public class Repl {
 
     private String logout() throws Exception {
         facade.logout(authToken);
+        this.authToken = null;
         return "Logged out of " + this.username + "'s session";
     }
 

@@ -14,7 +14,7 @@ import static chess.ChessGame.TeamColor.WHITE;
 import static ui.EscapeSequences.*;
 
 public class BoardPrinter {
-    private static List<String> boardColors = List.of(SET_BG_COLOR_WOOD_DARK, SET_BG_COLOR_WOOD_LIGHT);
+    private static List<String> boardColors = List.of(SET_BG_COLOR_WALNUT, SET_BG_COLOR_SAGE);
 
     public static String draw(ChessBoard board, ChessGame.TeamColor perspective) {
         StringBuilder out = new StringBuilder();
@@ -49,7 +49,7 @@ public class BoardPrinter {
         else {
             ChessGame.TeamColor color = piece.getTeamColor();
             ChessPiece.PieceType type = piece.getPieceType();
-            String textColor = (color == WHITE) ? SET_TEXT_COLOR_WHITE : SET_TEXT_COLOR_BLACK;
+            String textColor = (color == WHITE) ? SET_TEXT_COLOR_IVORY : SET_TEXT_COLOR_BLACK;
             String symbol = switch (type) {
                 case KING -> BLACK_KING;
                 case QUEEN -> BLACK_QUEEN;
@@ -63,9 +63,10 @@ public class BoardPrinter {
     }
 
     private static void drawLetterLabels(StringBuilder out, List<String> labels) {
+        out.append(SET_BG_COLOR_BLACK);
         for (String label : labels) {
             out.append(label);
         }
-        out.append("\n");
+        out.append(RESET_BG_COLOR + "\n");
     }
 }

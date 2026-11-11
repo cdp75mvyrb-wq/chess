@@ -33,6 +33,7 @@ public class EscapeSequences {
     public static final String SET_TEXT_COLOR_BLUE = SET_TEXT_COLOR + "12m";
     public static final String SET_TEXT_COLOR_MAGENTA = SET_TEXT_COLOR + "5m";
     public static final String SET_TEXT_COLOR_WHITE = SET_TEXT_COLOR + "15m";
+    public static final String SET_TEXT_COLOR_IVORY = SET_TEXT_COLOR + "230m";
     public static final String RESET_TEXT_COLOR = UNICODE_ESCAPE + "[39m";
 
     public static final String SET_BG_COLOR_BLACK = SET_BG_COLOR + "0m";
@@ -50,6 +51,8 @@ public class EscapeSequences {
     public static final String SET_BG_COLOR_SLATE_DARK  = SET_BG_COLOR + "60m";
     public static final String SET_BG_COLOR_WOOD_LIGHT = SET_BG_COLOR + "137m";
     public static final String SET_BG_COLOR_WOOD_DARK  = SET_BG_COLOR + "94m";
+    public static final String SET_BG_COLOR_SAGE    = UNICODE_ESCAPE + "[48;2;143;163;123m";   // #8fa37b
+    public static final String SET_BG_COLOR_WALNUT = UNICODE_ESCAPE + "[48;2;113;92;43m";   // #715c2b
 
     public static final String WHITE_KING = " ♔ ";
     public static final String WHITE_QUEEN = " ♕ ";
