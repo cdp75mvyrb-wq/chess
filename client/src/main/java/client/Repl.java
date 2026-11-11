@@ -1,6 +1,7 @@
 package client;
 
 import result.LoginResult;
+import result.LogoutResult;
 import result.RegisterResult;
 
 import java.util.Arrays;
@@ -9,6 +10,7 @@ import java.util.Scanner;
 public class Repl {
     private final ServerFacade facade;
     private String authToken = null;
+    private String username = null;
 
     public Repl(String serverUrl) {
         facade = new ServerFacade(serverUrl);
@@ -48,7 +50,11 @@ public class Repl {
             //logged in
             else {
                 return switch (commandWord) {
-                    case "logout" -> "logout not implemented yet";
+                    case "logout" -> logout();
+                    case "create" -> create(params);
+                    case "list" -> list();
+                    case "join" -> join(params);
+                    case "observe" -> observe(params);
                     default -> help();
                 };
             }
@@ -56,10 +62,32 @@ public class Repl {
         catch (Exception e) {return e.getMessage();}
     }
 
+    private String observe(String[] params) {
+        return null;
+    }
+
+    private String join(String[] params) {
+        return null;
+    }
+
+    private String list() {
+        return null;
+    }
+
+    private String create(String[] params) {
+        return null;
+    }
+
+    private String logout() throws Exception {
+        facade.logout(authToken);
+        return "Logged out of " + this.username + "'s session";
+    }
+
     private String login(String[] params) throws Exception {
         if (params.length != 2) {return "Incorrect login formatting.\nFormat: login <USERNAME> <PASSWORD>";}
         LoginResult result = facade.login(params[0], params[1]);
         this.authToken = result.authToken();
+        this.username = result.username();
         return "Logged in as " + result.username();
     }
 
@@ -67,6 +95,7 @@ public class Repl {
         if (params.length != 3) {return "Incorrect register formatting.\nFormat: register <USERNAME> <PASSWORD> <EMAIL>";}
         RegisterResult result = facade.register(params[0], params[1], params[2]);
         this.authToken = result.authToken();
+        this.username = result.username();
         return "Registered and logged in as " + result.username();
     }
 
