@@ -1,5 +1,7 @@
 package client;
 
+import result.RegisterResult;
+
 import java.util.Arrays;
 import java.util.Scanner;
 
@@ -49,7 +51,10 @@ public class Repl {
         return "login method not implemented yet";
     }
 
-    private String register(String[] params) {
-        return "register method not implemented yet";
+    private String register(String[] params) throws Exception {
+        if (params.length != 3) {return "Format: register <USERNAME> <PASSWORD> <EMAIL>";}
+        RegisterResult result = facade.register(params[0], params[1], params[2]);
+        this.authToken = result.authToken();
+        return "Registered and logged in as " + result.username();
     }
 }
