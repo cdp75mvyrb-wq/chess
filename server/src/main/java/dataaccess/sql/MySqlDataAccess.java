@@ -139,7 +139,9 @@ public class MySqlDataAccess implements DataAccess {
 
     @Override
     public void updateGame(GameData gameData) throws DataAccessException {
-        executeUpdate("UPDATE game SET whiteUsername = ?, blackUsername = ?, gameName = ?, game = ? WHERE gameID = ?", "Error: unable to update game data",
+        executeUpdate("UPDATE game SET whiteUsername = ?, blackUsername = ?, " +
+                        "gameName = ?, game = ? WHERE gameID = ?",
+                "Error: unable to update game data",
                 gameData.whiteUsername(),
                 gameData.blackUsername(),
                 gameData.gameName(),
@@ -149,7 +151,8 @@ public class MySqlDataAccess implements DataAccess {
 
     @Override
     public void createUser(UserData userData) throws DataAccessException {
-        executeUpdate("INSERT INTO user (username, password, email) VALUES (?, ?, ?)", "Error: unable to add user data",
+        executeUpdate("INSERT INTO user (username, password, email) VALUES (?, ?, ?)",
+                "Error: unable to add user data",
                 userData.username(),
                 userData.password(),
                 userData.email());
@@ -157,20 +160,23 @@ public class MySqlDataAccess implements DataAccess {
 
     @Override
     public void createAuth(AuthData authData) throws DataAccessException {
-        executeUpdate("INSERT INTO auth (authToken, username) VALUES (?, ?)", "Error: unable to add authentication data",
+        executeUpdate("INSERT INTO auth (authToken, username) VALUES (?, ?)",
+                "Error: unable to add authentication data",
                 authData.authToken(),
                 authData.username());
     }
 
     @Override
     public void deleteAuth(String authToken) throws DataAccessException {
-        executeUpdate("DELETE FROM auth WHERE authToken = ?", "Error: unable to delete auth data", authToken);
+        executeUpdate("DELETE FROM auth WHERE authToken = ?",
+                "Error: unable to delete auth data", authToken);
     }
 
     @Override
     public int createGame(String gameName) throws DataAccessException {
         String gameJson = gson.toJson(new ChessGame());
-        return executeUpdate("INSERT INTO game (gameName, game) VALUES (?, ?)", "Error: unable to create game", gameName, gameJson);
+        return executeUpdate("INSERT INTO game (gameName, game) VALUES (?, ?)",
+                "Error: unable to create game", gameName, gameJson);
     }
 
     @Override
