@@ -1,6 +1,7 @@
 package client;
 
 import chess.ChessBoard;
+import chess.ChessGame;
 import model.GameData;
 import result.CreateGameResult;
 import result.JoinGameResult;
@@ -11,6 +12,7 @@ import ui.BoardPrinter;
 import static chess.ChessGame.TeamColor.*;
 import static ui.EscapeSequences.*;
 
+import java.net.ConnectException;
 import java.util.*;
 
 public class Repl {
@@ -25,12 +27,12 @@ public class Repl {
 
     public void run() {
         System.out.println(SET_TEXT_BOLD +
-                SET_TEXT_COLOR_MAGENTA +
-                "Welcome to CS 240 Chess!\n" +
-                SET_TEXT_COLOR_YELLOW +
+                SET_TEXT_COLOR_IVORY +
+                "\nWelcome to CS 240 Chess!\n" +
+                SET_TEXT_COLOR_SAGE +
                 SET_TEXT_ITALIC +
                 RESET_TEXT_BOLD_FAINT +
-                "Type 'help' to get started" +
+                "\n- Type 'help' to get started -\n" +
                 RESET_TEXT_ITALIC);
         Scanner scanner = new Scanner(System.in);
         while (true) {
@@ -41,7 +43,7 @@ public class Repl {
                     "[LOGGED IN] >> " +
                     RESET_TEXT_COLOR);}
             String result = eval(scanner.nextLine());
-            if (result ==  "quit") {
+            if (result.equals("quit")) {
                 break;
             }
             System.out.println(result);
@@ -56,26 +58,31 @@ public class Repl {
             //logged out
             if (authToken == null) {
                 return switch (commandWord) {
-                    case "register" -> register(params);
-                    case "login" -> login(params);
-                    case "help" -> help();
-                    case "quit" -> "quit";
-                    default -> help();
+                    case "register" -> "\n" + register(params) + "\n";
+                    case "login" -> "\n" + login(params) + "\n";
+                    case "help" -> "\n" + help() + "\n";
+                    case "quit" -> "\n" + "quit" + "\n";
+                    default -> "\n" + help();
                 };
             }
             //logged in
             else {
                 return switch (commandWord) {
-                    case "logout" -> logout();
-                    case "create" -> create(params);
-                    case "list" -> list();
-                    case "join" -> join(params);
-                    case "observe" -> observe(params);
+                    case "logout" -> "\n" + logout() + "\n";
+                    case "create" -> "\n" + create(params) + "\n";
+                    case "list" -> "\n" + list();
+                    case "join" -> "\n" + join(params) + "\n";
+                    case "observe" -> "\n" + observe(params) + "\n";
                     case "quit" -> "quit";
-                    default -> help();
+                    default -> "\n" + help();
                 };
             }
         }
+        catch (NumberFormatException e) {return "Game number must be a number.";}
+        catch (ConnectException e) {return SET_TEXT_COLOR_RED +
+                "\nCould not reach the server\n" +
+                RESET_TEXT_COLOR +
+                "\nPlease check your connection and try again\n";}
         catch (Exception e) {return e.getMessage();}
     }
 
@@ -83,7 +90,7 @@ public class Repl {
         if (params.length != 1) {return "Incorrect formatting.\nFormat: observe <ID>\nType 'list' to see possible games to observe.";}
         int id = Integer.parseInt(params[0]);
         if (id < 1 || id > lastListedGames.size()) {
-            return "ID does not exist.\nType 'list' to see possible games to observe.";
+            return "Game number does not exist.\nType 'list' to see possible games to observe.";
         }
         return BoardPrinter.draw(lastListedGames.get(id - 1).game().getBoard(), WHITE);
     }
@@ -92,7 +99,7 @@ public class Repl {
         if (params.length != 2) {return "Incorrect formatting.\nFormat: join <ID> [WHITE|BLACK]\nType 'list' to see possible games to join.";}
         int id = Integer.parseInt(params[0]);
         if (id < 1 || id > lastListedGames.size()) {
-            return "ID does not exist.\nType 'list' to see possible games to join.";
+            return "Game number does not exist.\nType 'list' to see possible games to join.";
         }
         GameData game = lastListedGames.get(id - 1);
         String color = params[1].toUpperCase();
@@ -100,29 +107,34 @@ public class Repl {
             return "Color must be WHITE or BLACK.";
         }
         facade.joinGame(authToken, color, game.gameID());
-        return BoardPrinter.draw(game.game().getBoard(), WHITE);
+        return BoardPrinter.draw(game.game().getBoard(), ChessGame.TeamColor.valueOf(color));
     }
 
     private String list() throws Exception {
         this.lastListedGames = new ArrayList<>(facade.listGames(authToken).games());
-        if (lastListedGames.isEmpty()) {return "- NO CURRENT ACTIVE GAMES -";}
-        System.out.println("- CURRENT ACTIVE GAMES -");
+        if (lastListedGames.isEmpty()) {return "- NO CURRENT ACTIVE GAMES -\n";}
+        StringBuilder out = new StringBuilder();
+        out.append("- CURRENT ACTIVE GAMES -\n");
         int index = 1;
         for (GameData game : lastListedGames) {
-            String whiteUser = game.whiteUsername() == null ? SET_TEXT_COLOR_GREEN + "OPEN" + RESET_TEXT_COLOR : SET_TEXT_COLOR_RED + game.whiteUsername() + RESET_TEXT_COLOR;
-            String blackUser = game.blackUsername() == null ? SET_TEXT_COLOR_GREEN + "OPEN" + RESET_TEXT_COLOR : SET_TEXT_COLOR_RED + game.blackUsername() + RESET_TEXT_COLOR;
-            System.out.println(index + ": " + game.gameName());
-            System.out.println("   White: " + whiteUser);
-            System.out.println("   Black: " + blackUser);
+            out.append(index).append(": ").append(game.gameName()).append("\n");
+            out.append("   White: ").append(formatPlayer(game.whiteUsername())).append("\n");
+            out.append("   Black: ").append(formatPlayer(game.blackUsername())).append("\n");
             index += 1;
         }
-        return "";
+        return out.toString();
+    }
+
+    private String formatPlayer(String username) {
+        return username == null
+                ? SET_TEXT_COLOR_GREEN + "OPEN" + RESET_TEXT_COLOR
+                : SET_TEXT_COLOR_RED + username + RESET_TEXT_COLOR;
     }
 
     private String create(String[] params) throws Exception {
         if (params.length != 1) {return "Incorrect formatting.\nFormat: create <NAME>";}
-        CreateGameResult result = facade.createGame(authToken, params[0]);
-        return "Game created!\nYour game ID is: " + result.gameID();
+        facade.createGame(authToken, params[0]);
+        return "Created game '" + params[0] + "'.\nType 'list' to see active games.";
     }
 
     private String logout() throws Exception {
