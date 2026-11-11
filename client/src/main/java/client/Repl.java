@@ -1,9 +1,13 @@
 package client;
 
+import chess.ChessBoard;
 import model.GameData;
 import result.CreateGameResult;
 import result.LoginResult;
 import result.RegisterResult;
+import ui.BoardPrinter;
+
+import static ui.EscapeSequences.*;
 
 import java.util.*;
 
@@ -18,13 +22,24 @@ public class Repl {
     }
 
     public void run() {
-        System.out.println("Welcome to CS 240 Chess. Type help to get started");
+        System.out.println(SET_TEXT_BOLD +
+                SET_TEXT_COLOR_MAGENTA +
+                "Welcome to CS 240 Chess!\n" +
+                SET_TEXT_COLOR_YELLOW +
+                SET_TEXT_ITALIC +
+                RESET_TEXT_BOLD_FAINT +
+                "Type 'help' to get started" +
+                RESET_TEXT_ITALIC);
         Scanner scanner = new Scanner(System.in);
         while (true) {
-            if (authToken == null) {System.out.print("[LOGGED OUT] >> ");}
-            else {System.out.print("[LOGGED IN] >> ");}
+            if (authToken == null) {System.out.print(SET_TEXT_COLOR_RED +
+                    "[LOGGED OUT] >> " +
+                    RESET_TEXT_COLOR);}
+            else {System.out.print(SET_TEXT_COLOR_GREEN +
+                    "[LOGGED IN] >> " +
+                    RESET_TEXT_COLOR);}
             String result = eval(scanner.nextLine());
-            if (result.equals("quit")) {
+            if (result ==  "quit") {
                 break;
             }
             System.out.println(result);
@@ -42,6 +57,7 @@ public class Repl {
                     case "register" -> register(params);
                     case "login" -> login(params);
                     case "help" -> help();
+                    case "quit" -> "quit";
                     default -> """
                             Your input could not be interpreted!
                             Type "help" to see possible commands
@@ -56,6 +72,7 @@ public class Repl {
                     case "list" -> list();
                     case "join" -> join(params);
                     case "observe" -> observe(params);
+                    case "quit" -> "quit";
                     default -> help();
                 };
             }
@@ -69,10 +86,15 @@ public class Repl {
         if (id < 1 || id > lastListedGames.size()) {
             return "ID does not exist.\nType 'list' to see possible games to observe.";
         }
-        return lastListedGames.get(id - 1).game().getBoard().toString();
+        return BoardPrinter.draw(lastListedGames.get(id - 1).game().getBoard(), "WHITE");
     }
 
     private String join(String[] params) {
+        //check color input
+        String color = params[1].toUpperCase();
+        if (!color.equals("WHITE") && !color.equals("BLACK")) {
+            return "Color must be WHITE or BLACK.";
+        }
         return null;
     }
 
@@ -103,7 +125,13 @@ public class Repl {
         LoginResult result = facade.login(params[0], params[1]);
         this.authToken = result.authToken();
         this.username = result.username();
-        return "Logged in as " + result.username();
+        return SET_TEXT_ITALIC +
+                SET_TEXT_COLOR_LIGHT_GREY +
+                "Logged in as: " +
+                RESET_TEXT_ITALIC +
+                SET_TEXT_COLOR_WHITE +
+                result.username() +
+                RESET_BG_COLOR;
     }
 
     private String register(String[] params) throws Exception {
@@ -115,20 +143,22 @@ public class Repl {
     }
 
     private String help() {
-        String out = """
+        String out = SET_TEXT_COLOR_BLUE + """
                 register <USERNAME> <PASSWORD> <EMAIL> - create an account
                 login <USERNAME> <PASSWORD> - play chess
                 quit - exit chess program
                 help - see possible commands
-                """;
-        String in = """
+                """ +
+                RESET_TEXT_COLOR;
+        String in = SET_TEXT_COLOR_BLUE + """
                 create <NAME> - chess game
                 join <ID> [WHITE|BLACK] - chess game
                 observe <ID> - chess game
                 logout - exit user session
                 quit - exit chess program
                 help - see possible commands
-                """;
+                """ +
+                RESET_TEXT_COLOR;
         return switch (authToken) {
             case null -> out;
             default -> in;
