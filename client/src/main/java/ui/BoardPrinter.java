@@ -14,7 +14,7 @@ import static chess.ChessGame.TeamColor.WHITE;
 import static ui.EscapeSequences.*;
 
 public class BoardPrinter {
-    private String squareColor = SET_BG_COLOR_LIGHT_GREY;
+    private static List<String> boardColors = List.of(SET_BG_COLOR_WOOD_DARK, SET_BG_COLOR_WOOD_LIGHT);
 
     public static String draw(ChessBoard board, ChessGame.TeamColor perspective) {
         StringBuilder out = new StringBuilder();
@@ -36,7 +36,7 @@ public class BoardPrinter {
         for (Integer row : rowNumbers) {
             out.append(SET_BG_COLOR_BLACK + " " + row + " " + RESET_BG_COLOR);
             for (Integer col : rowNumbers.reversed()) {
-                out.append(((row + col) % 2) == 1 ? SET_BG_COLOR_DARK_GREY : SET_BG_COLOR_LIGHT_GREY);
+                out.append(((row + col) % 2) == 0 ? boardColors.get(0) : boardColors.get(1));
                 out.append(getPiece(board, row, col));
             }
             out.append(SET_BG_COLOR_BLACK + " " + row + " " + RESET_BG_COLOR + "\n");
