@@ -31,12 +31,6 @@ public class ServerFacadeTests {
     }
 
     @Test
-    public void sampleTest() {
-        Assertions.assertTrue(true);
-    }
-
-
-    @Test
     void registerSuccess() throws Exception {
         assertDoesNotThrow(() -> facade.register("sam", "1234", "sam@byu.edu"));
     }
