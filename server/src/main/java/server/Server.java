@@ -2,7 +2,6 @@ package server;
 import com.google.gson.Gson;
 import dataaccess.DataAccess;
 import dataaccess.DataAccessException;
-import dataaccess.MemoryDataAccess;
 import dataaccess.sql.MySqlDataAccess;
 import handler.GameHandler;
 import handler.UserHandler;
@@ -16,8 +15,6 @@ import service.UserService;
 import service.exception.AlreadyTakenException;
 import service.exception.BadRequestException;
 import service.exception.UnauthorizedException;
-
-import javax.naming.ldap.spi.LdapDnsProvider;
 import java.util.Map;
 
 public class Server {

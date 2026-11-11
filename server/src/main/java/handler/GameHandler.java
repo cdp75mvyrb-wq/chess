@@ -33,8 +33,8 @@ public class GameHandler {
         ctx.result(gson.toJson(result));
     }
 
-    public void join(Context ctx) throws DataAccessException, BadRequestException, AuthenticationException {
+    public void join(Context ctx) throws DataAccessException, BadRequestException{
         JoinGameRequest request = gson.fromJson(ctx.body(), JoinGameRequest.class);
-        JoinGameResult result = gameService.joinGame(request, ctx.header("authorization"));
+        gameService.joinGame(request, ctx.header("authorization"));
     }
 }
