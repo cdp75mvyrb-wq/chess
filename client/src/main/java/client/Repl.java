@@ -1,16 +1,17 @@
 package client;
 
+import model.GameData;
+import result.CreateGameResult;
 import result.LoginResult;
-import result.LogoutResult;
 import result.RegisterResult;
 
-import java.util.Arrays;
-import java.util.Scanner;
+import java.util.*;
 
 public class Repl {
     private final ServerFacade facade;
     private String authToken = null;
     private String username = null;
+    private Collection<GameData> lastListedGames = new ArrayList<>();
 
     public Repl(String serverUrl) {
         facade = new ServerFacade(serverUrl);
@@ -63,19 +64,33 @@ public class Repl {
     }
 
     private String observe(String[] params) {
-        return null;
+        if (params.length != 1) {return "Incorrect formatting.\nFormat: observe <ID>\nType 'list' to see possible games to observe.";}
+        int id = Integer.parseInt(params[0]);
+        if (id < 1 || id > lastListedGames.size()) {
+            return "ID does not exist.\nType 'list' to see possible games to observe.";
+        }
+        return "List games now";
     }
 
     private String join(String[] params) {
         return null;
     }
 
-    private String list() {
-        return null;
+    private String list() throws Exception {
+        System.out.println("Current active games:");
+        this.lastListedGames = facade.listGames(authToken).games();
+        int index = 1;
+        for (GameData game : lastListedGames) {
+            System.out.println(index + ": " + game.gameName());
+            index += 1;
+        }
+        return "END OF LIST";
     }
 
-    private String create(String[] params) {
-        return null;
+    private String create(String[] params) throws Exception {
+        if (params.length != 1) {return "Incorrect formatting.\nFormat: create <NAME>";}
+        CreateGameResult result = facade.createGame(authToken, params[0]);
+        return "Game created!\nYour game ID is: " + result.gameID();
     }
 
     private String logout() throws Exception {
