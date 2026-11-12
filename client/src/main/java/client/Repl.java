@@ -1,10 +1,7 @@
 package client;
 
-import chess.ChessBoard;
 import chess.ChessGame;
 import model.GameData;
-import result.CreateGameResult;
-import result.JoinGameResult;
 import result.LoginResult;
 import result.RegisterResult;
 import ui.BoardPrinter;

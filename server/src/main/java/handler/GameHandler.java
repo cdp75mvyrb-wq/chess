@@ -5,13 +5,10 @@ import dataaccess.DataAccessException;
 import io.javalin.http.Context;
 import request.*;
 import result.CreateGameResult;
-import result.JoinGameResult;
 import result.ListGamesResult;
 import service.GameService;
 import service.exception.BadRequestException;
 import service.exception.UnauthorizedException;
-
-import javax.naming.AuthenticationException;
 
 public class GameHandler {
 
