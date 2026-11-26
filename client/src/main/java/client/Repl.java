@@ -58,7 +58,7 @@ public class Repl {
                     case "register" -> "\n" + register(params) + "\n";
                     case "login" -> "\n" + login(params) + "\n";
                     case "help" -> "\n" + help() + "\n";
-                    case "quit" -> "\n" + "quit" + "\n";
+                    case "quit" -> "quit";
                     default -> "\n" + help();
                 };
             }
@@ -75,7 +75,7 @@ public class Repl {
                 };
             }
         }
-        catch (NumberFormatException e) {return "Game number must be a number.";}
+        catch (NumberFormatException e) {return "\nGame number must be a number.\n";}
         catch (ConnectException e) {return SET_TEXT_COLOR_RED +
                 "\nCould not reach the server\n" +
                 RESET_TEXT_COLOR +
